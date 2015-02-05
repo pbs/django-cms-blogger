@@ -6,9 +6,9 @@
     </div>
     <div class='right-col clearfix'>
         <h1 id='entry-title'><a href="{{PROXY_REWRITE_RULE}}{{entry.get_absolute_url}}">{{entry.title}}</a></h1>
-        <p class="subtitle">
+        <h5 class="subtitle">
             Posted by <span class="author">{{entry.authors_display_name}}</span>
-        </p>
+        </h5>
         {% if entry.poster_image and not hide_entry_image %}
             <div class='right-col'>
                 <a href="{{PROXY_REWRITE_RULE}}{{entry.get_absolute_url}}">
