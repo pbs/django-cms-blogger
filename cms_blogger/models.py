@@ -5,13 +5,13 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.generic import GenericRelation
-from django.utils.translation import get_language
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.db.models import signals
 from django.dispatch import receiver
 from django.http import HttpResponseNotFound
 
+from cms.utils import get_default_language
 from cms.models.fields import PlaceholderField
 from cms.models import Placeholder, CMSPlugin
 
@@ -90,7 +90,7 @@ def getCMSContentModel(**kwargs):
         if not placeholder.get_plugins():
             from cms.api import add_plugin
             new_plugin = add_plugin(
-                placeholder, 'TextPlugin', get_language(),
+                placeholder, 'TextPlugin', get_default_language(),
                 body=getattr(instance, body_attr))
             return new_plugin
         first_plugin = placeholder.get_plugins()[0]
