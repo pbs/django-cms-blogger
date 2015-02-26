@@ -7,7 +7,11 @@
     <div class='right-col clearfix'>
         <h1 id='entry-title'><a href="{{PROXY_REWRITE_RULE}}{{entry.get_absolute_url}}">{{entry.title}}</a></h1>
         <p class="subtitle">
-            Posted by <span class="author">{{entry.authors_display_name}}</span>
+        {% with author_names=entry.authors_display_name %}
+        {% if author_names %}
+            {% if entry.modified_at > entry.publication_date %}Updated{% else %}Posted{% endif %} by <span class="author">{{entry.authors_display_name}}</span>
+        {% endif %}
+        {% endwith %}
         </p>
         {% if entry.poster_image and not hide_entry_image %}
             <div class='right-col'>

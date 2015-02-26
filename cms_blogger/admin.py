@@ -738,10 +738,12 @@ def _move_entries(destination_blog, entries_ids, mirror_categories=True):
 
     # regenerate slugs for saved entries (which
     # are not draft) to make sure they are unique
-    saved_entries_ids = list(
-        entries.filter(draft_id=None).values_list('id', flat=True))
-    BlogEntryPage.objects.filter(id__in=saved_entries_ids).update(slug="")
+    saved_entries_ids = entries.filter(
+        draft_id=BlogEntryPage.NOT_DRAFT
+    ).values_list('id', flat=True)
+
     for e in BlogEntryPage.objects.filter(id__in=saved_entries_ids):
+        e.slug = ''
         e.save()
 
     # performance improvement getting previous_categories in dict

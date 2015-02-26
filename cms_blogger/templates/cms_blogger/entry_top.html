@@ -21,7 +21,11 @@
 <div class='right-col'>
     <h1 id='entry-title'>{{entry.title}}</h1>
     <p class="subtitle">
-        Posted by <span class="author">{{entry.authors_display_name}}</span>
+    {% with author_names=entry.authors_display_name %}
+    {% if author_names %}
+        {% if entry.modified_at > entry.publication_date %}Updated{% else %}Posted{% endif %} by <span class="author">{{entry.authors_display_name}}</span>
+    {% endif %}
+    {% endwith %}
     </p>
     {% if entry.enable_poster_image %}
     {% include "cms_blogger/poster_image.html" %}
