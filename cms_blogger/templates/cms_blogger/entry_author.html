@@ -1,0 +1,13 @@
+<p class="subtitle">
+{% if is_updated %}Updated{% else %}Posted{% endif %}{% if author_names %} by <span class="author">{{author_names}}</span>{% endif %} at
+<script type="text/javascript">
+Date.prototype.get12HourClock = Date.prototype.get12HourClock || function () {
+    var hour = this.getHours(),
+        h = hour % 12,
+        m = this.getMinutes(),
+        meridian = hour >= 12 ? 'pm' : 'am';
+    return (h ? h : 12) + ':' + (m < 10 ? '0' + m : m) + ' ' + meridian;
+};
+document.write((new Date({{utc_millis}})).get12HourClock());
+</script>
+</p>
