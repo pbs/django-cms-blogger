@@ -516,6 +516,8 @@ class EntryChangelistForm(forms.ModelForm):
                 self.instance.end_publication = None
 
             self.instance.publication_date = timezone.now()
+
+        self.instance.update_date = timezone.now()
         return is_published
 
     class Meta:
@@ -752,6 +754,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         start_date = self.cleaned_data.get('start_publication')
         if start_date != self.instance.start_publication or not was_published:
             self.instance.publication_date = start_date or now
+        self.instance.update_date = timezone.now()
 
     def clean(self):
         start_date = self.cleaned_data.get('start_publication')

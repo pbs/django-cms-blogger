@@ -617,8 +617,6 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
 
         if self._initial_pub_date != self.publication_date:
             self.update_date = self.publication_date
-        else:
-            self.update_date = timezone.now()
 
         super(BlogEntryPage, self).save(*args, **kwargs)
         # _old_poster_image attribute is available only when a new image
