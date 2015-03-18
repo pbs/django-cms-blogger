@@ -63,4 +63,5 @@ def author_row(entry):
         'is_updated': is_updated,
         'utc_millis': as_millis(mod_time if is_updated else pub_time),
         'author_names': entry.authors_display_name,
+        'entry': entry
     }

@@ -13,6 +13,10 @@
             font-size: 10px;
             padding: 15px;
             width: auto;
+
+            .pbs-audio {
+                margin-bottom: 30px;
+            }
         }
         .blog-entry{
             font-size: 10px;
@@ -224,6 +228,15 @@
                 font-size: 13px;
                 .author{
                     color:$entry-text-color;
+                }
+                .author-pub-time{
+                    margin-right: 15px;
+                }
+                .author-extra {
+                    img {
+                        max-height: 15px;
+                        width: auto;
+                    }
                 }
             }
             .entry-summary{

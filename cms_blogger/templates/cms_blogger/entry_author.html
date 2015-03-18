@@ -1,5 +1,5 @@
 <p class="subtitle">
-{% if is_updated %}Updated{% else %}Posted{% endif %}{% if author_names %} by <span class="author">{{author_names}}</span>{% endif %} at
+{% if is_updated %}Updated{% else %}Posted{% endif %}{% if author_names %} by <span class="author">{{author_names}}</span>{% endif %}<span class="author-pub-time"> at
 <script type="text/javascript">
 Date.prototype.get12HourClock = Date.prototype.get12HourClock || function () {
     var hour = this.getHours(),
@@ -9,5 +9,5 @@ Date.prototype.get12HourClock = Date.prototype.get12HourClock || function () {
     return (h ? h : 12) + ':' + (m < 10 ? '0' + m : m) + ' ' + meridian;
 };
 document.write((new Date({{utc_millis}})).get12HourClock());
-</script>
+</script></span><span class="author-extra">{% include 'cms_blogger/entry_author_extra.html' %}</span>
 </p>
