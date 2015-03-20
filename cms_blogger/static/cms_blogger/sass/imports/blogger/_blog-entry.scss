@@ -14,9 +14,6 @@
             padding: 15px;
             width: auto;
         }
-        .blog-entry{
-            font-size: 10px;
-        }
         .last{
             .#{$container} > .right-col{
                 border:0;
@@ -35,6 +32,12 @@
                         float: none;
                         width: auto;
                         padding-left: 0;
+
+                        & + .left-col {
+                            float: none;
+                            width: auto;
+                            padding-right: 0;
+                        }
                         .entry-image-container{
                             margin-bottom: 10px;
                         }
@@ -49,9 +52,6 @@
             color:$entry-text-color;
             background: #fff;
 
-            p{
-                font-size: 14px;
-            }
             & > .left-col{
                 float:left;
                 width: 50px;
@@ -133,8 +133,6 @@
 
 
                 h1{
-                    line-height: 38px;
-                    font-size: 30px;
                     text-align: left;
                     padding: 0;
                     margin:0;
@@ -210,7 +208,7 @@
                 padding: 5px 20px;
                 text-decoration: none;
                 margin:0;
-                font-size: 14px;
+                font-size: 16px;
                 white-space: nowrap;
                 @include border-radius(3px);
                 &:hover{
@@ -221,15 +219,16 @@
             .subtitle{
                 margin: 0 0 10px 0;
                 color: $entry-subtitle-color;
-                font-size: 13px;
+                text-transform: none;
+                font-weight: normal;
                 .author{
+                    text-transform: none;
                     color:$entry-text-color;
                 }
             }
             .entry-summary{
                 margin: 0 0 30px 0;
                 text-align: left;
-                font-size: 13px;
                 color: $entry-text-color;
             }
 
