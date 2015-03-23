@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 6396ae4 (23.03.2015, 17:07 UTC)
+----------------------------------------
+
+* LUN-2088
+
+  * #LUN-2088: cms_blogger font sizes and template updates
+
+No other commits.
+
 Revision a03520a (13.01.2015, 09:47 UTC)
 ----------------------------------------
 
