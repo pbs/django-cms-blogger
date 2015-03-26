@@ -866,13 +866,3 @@
 .cms-blogger .blog-entry .img-details {
   display: none;
 }
-
-/* line 19, ../sass/imports/blogger/_globals.scss */
-.no-padding {
-  padding: 0 !important;
-}
-
-/* line 5, ../sass/imports/blogger/_snippets.scss */
-.cms-blogger .promo-container.horizontal .promo {
-  height: 100% !important;
-}
