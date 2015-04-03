@@ -88,13 +88,14 @@ def getCMSContentModel(**kwargs):
             return None
         if not placeholder:
             return None
-        if not placeholder.get_plugins():
+        plugins_qs = placeholder.get_plugins().order_by('tree_id', 'lft')[:1]
+        if not plugins_qs:
             from cms.api import add_plugin
             new_plugin = add_plugin(
                 placeholder, 'TextPlugin', get_default_language(),
                 body=getattr(instance, body_attr))
             return new_plugin
-        first_plugin = placeholder.get_plugins()[0]
+        first_plugin = plugins_qs[0]
         plg_instance, plg_cls = first_plugin.get_plugin_instance()
         return plg_instance
 
