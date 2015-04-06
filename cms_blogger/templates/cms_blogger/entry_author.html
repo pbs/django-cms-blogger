@@ -1,4 +1,4 @@
-<p class="subtitle">
+<h5 class="subtitle">
 {% if is_updated %}Updated{% else %}Posted{% endif %}{% if author_names %} by <span class="author">{{author_names}}</span>{% endif %}<span class="author-pub-time"> at
 <script type="text/javascript">
 Date.prototype.get12HourClock = Date.prototype.get12HourClock || function () {
@@ -10,4 +10,4 @@ Date.prototype.get12HourClock = Date.prototype.get12HourClock || function () {
 };
 document.write((new Date({{utc_millis}})).get12HourClock());
 </script></span><span class="author-extra">{% include 'cms_blogger/entry_author_extra.html' %}</span>
-</p>
+</h5>
