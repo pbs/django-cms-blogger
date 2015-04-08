@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 7de096a (08.04.2015, 11:40 UTC)
+----------------------------------------
+
+* LUN-2141
+
+  * Custom promo block was overrided by unuseful css from Blogger
+
+No other commits.
+
 Revision 6396ae4 (23.03.2015, 17:07 UTC)
 ----------------------------------------
 
