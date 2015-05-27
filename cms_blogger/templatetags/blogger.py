@@ -37,6 +37,8 @@ def as_millis(datetime_obj):
 
 @register.inclusion_tag('cms_blogger/entry_pub_date.html')
 def publish_date_box(entry):
+    if not hasattr(entry, 'update_date'):
+        return {}
     mod_time = as_utc(entry.update_date)
     pub_time = as_utc(entry.publication_date)
     is_updated = mod_time > pub_time
@@ -55,6 +57,8 @@ def publish_date_box(entry):
 
 @register.inclusion_tag('cms_blogger/entry_author.html')
 def author_row(entry):
+    if not hasattr(entry, 'update_date'):
+        return {}
     mod_time = as_utc(entry.update_date)
     pub_time = as_utc(entry.publication_date)
     is_updated = mod_time > pub_time
