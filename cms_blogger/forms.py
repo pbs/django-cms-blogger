@@ -516,6 +516,8 @@ class EntryChangelistForm(forms.ModelForm):
                 self.instance.end_publication = None
 
             self.instance.publication_date = timezone.now()
+
+        self.instance.update_date = timezone.now()
         return is_published
 
     class Meta:
@@ -663,8 +665,6 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         self._init_authors_field(request)
         if not 'body' in self.initial:
             self.initial['body'] = self.instance.content_body
-        # prepare for save
-        self.instance.draft_id = None
 
     def _init_authors_field(self, request):
         self.fields['authors'].widget.options['tokenSeparators'] = [',']
@@ -754,6 +754,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         start_date = self.cleaned_data.get('start_publication')
         if start_date != self.instance.start_publication or not was_published:
             self.instance.publication_date = start_date or now
+        self.instance.update_date = timezone.now()
 
     def clean(self):
         start_date = self.cleaned_data.get('start_publication')

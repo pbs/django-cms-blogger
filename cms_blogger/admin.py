@@ -159,8 +159,8 @@ class AbstractBlogAdmin(AdminHelper):
     location_in_navigation.short_description = 'Select location'
 
     def get_formsets(self, request, obj=None):
-        # don't show layout inline in add view
-        if self.form in (forms.BlogForm, forms.HomeBlogForm):
+        # show layout inline only for valid existing blogs
+        if obj and obj.pk and obj.layouts.exists():
             # set request for navigation_preview
             obj._request_for_navigation_preview = request
             return super(AbstractBlogAdmin, self).get_formsets(request, obj)
@@ -732,17 +732,21 @@ def _move_entries(destination_blog, entries_ids, mirror_categories=True):
                 name=category_name,
                 blog=destination_blog)
 
-    # link entries foreign key to the new blog
     entries = BlogEntryPage.objects.filter(id__in=entries_ids)
-    entries.update(blog=destination_blog)
 
     # regenerate slugs for saved entries (which
     # are not draft) to make sure they are unique
-    saved_entries_ids = list(
-        entries.filter(draft_id=None).values_list('id', flat=True))
-    BlogEntryPage.objects.filter(id__in=saved_entries_ids).update(slug="")
+    saved_entries_ids = entries.filter(
+        draft_id=BlogEntryPage.NOT_DRAFT
+    ).values_list('id', flat=True)
+
     for e in BlogEntryPage.objects.filter(id__in=saved_entries_ids):
+        e.blog = destination_blog
+        e.slug = ''
         e.save()
+
+    # link entries foreign key to the new blog
+    entries.exclude(id__in=saved_entries_ids).update(blog=destination_blog)
 
     # performance improvement getting previous_categories in dict
     for blogentry in BlogEntryPage.objects.filter(id__in=entries_ids):

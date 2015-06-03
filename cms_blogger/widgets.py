@@ -22,6 +22,8 @@ class ToggleWidget(forms.widgets.CheckboxInput):
         "<script type='text/javascript'> jQuery("
         "function(){jQuery('.toggle_%s').toggles({"
         "checkbox: jQuery('#id_%s'), "
+        "click: %s,"
+        "drag: %s,"
         "height: 30,"
         "width: 65,"
         "on:jQuery('#id_%s').is(':checked')});});</script>")
@@ -35,8 +37,11 @@ class ToggleWidget(forms.widgets.CheckboxInput):
         attrs.update({'class': 'toggle', 'style': 'display:none'})
         widget_html = super(ToggleWidget, self).render(
             name, value, attrs=attrs)
-        output = self.toggle_html % (
-            name, widget_html, self.toggle_script % ((name,) * 3))
+        is_disabled = (self.attrs.get('disabled', False) or
+                       attrs.get('disabled', False))
+        active = 'false' if is_disabled else 'true'
+        script_out = self.toggle_script % (name, name, active, active, name)
+        output = self.toggle_html % (name, widget_html, script_out)
         return mark_safe(output)
 
 
