@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+Revision 5e91574 (04.06.2015, 17:17 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * fixed tests
+  * make sure first plugin is a TextPlugin
+  * always use first plugin since that should be the text one
+  * allow author row template to include extra data
+  * allow toggler to be disabled
+  * allow update_date to be set programatically * allow formsets for extended forms
+  * added update date which will be used for entries ordering * update date has bigger priority than publication date
+  * fixed issue with unique_together on nullable field (mysql: NULL!=NULL) * now showing "Updated at" before authors when an entry got updated after publishing
+  * fixed default language for cms plugins create
+
 Revision 7de096a (08.04.2015, 11:40 UTC)
 ----------------------------------------
 
