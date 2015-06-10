@@ -15,12 +15,12 @@ class BlogChangeList(ChangeList):
         self.current_site = get_current_site(request, model)
         super(BlogChangeList, self).__init__(request, model, *args, **kwargs)
 
-    def get_query_set(self, request):
-        qs = super(BlogChangeList, self).get_query_set(request)
+    def get_queryset(self, request):
+        qs = super(BlogChangeList, self).get_queryset(request)
         return qs.filter(**{self.site_lookup: self.current_site})
 
     def get_results(self, request):
-        self.root_query_set = self.root_query_set.filter(
+        self.root_queryset = self.root_queryset.filter(
             **{self.site_lookup: self.current_site})
         super(BlogChangeList, self).get_results(request)
 

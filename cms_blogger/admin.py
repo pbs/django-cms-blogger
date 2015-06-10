@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.contenttypes.generic import GenericTabularInline
@@ -440,9 +440,9 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     def get_changelist_form(self, request, **kwargs):
         return forms.EntryChangelistForm
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
+    def change_view(self, request, *args, **kwargs):
         response = super(BlogEntryPageAdmin, self).change_view(
-            request, object_id, form_url, extra_context)
+            request, *args, **kwargs)
         if hasattr(response, 'context_data'):
             context = response.context_data
             context['media'] = self._upgrade_jquery(context['media'])

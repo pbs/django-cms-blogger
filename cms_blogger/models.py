@@ -300,8 +300,8 @@ class Blog(AbstractBlog):
         _("slug"), max_length=50, help_text=_('Blog Slug'))
 
     entries_slugs_with_date = models.BooleanField(
-        _("Dates in blog entry URLs"),
-        help_text=_('Blog Entries With Slugs'))
+        _("Dates in blog entry URLs"), default=False,
+        help_text=_('Blog Entries With Slugs'),)
     # permission system
     allowed_users = models.ManyToManyField(User, verbose_name=_("Add Users"))
     # social media integration
@@ -670,9 +670,6 @@ class BlogCategory(models.Model, BlogRelatedPage):
             self.slug = get_unique_slug(
                 self, self.name, unique_qs, keep_connection_words=False)
         super(BlogCategory, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return self.name
 
     class Meta:
         unique_together = (("slug", 'blog'),)
