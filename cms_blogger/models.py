@@ -385,7 +385,8 @@ class Author(models.Model):
         related_name='blog_authors')
     slug = models.SlugField(
         _('slug'), max_length=150,
-        help_text=_("Used to build the author's URL."))
+        help_text=_("Used to build the author's URL."),
+        null=False, unique=True)
 
     def save(self, *args, **kwargs):
         if not self.slug and self.display_name:

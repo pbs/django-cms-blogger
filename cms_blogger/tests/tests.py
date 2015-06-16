@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.template import Template
 from django.utils import timezone
 from django.test.client import RequestFactory
+from django.db import IntegrityError
 from dateutil import tz, parser
 
 from cms_blogger.models import *
@@ -1113,6 +1114,12 @@ class TestAuthorModel(TestCase):
         # only custom author should get deleted since it's not in use and the
         #   authors generated from users should never get deleted
         self.assertEquals(Author.objects.count(), 2)
+
+    def test_slug_constraint(self):
+        with self.assertRaises(IntegrityError):
+            Author.objects.bulk_create([Author(slug='')] * 2)
+        with self.assertRaises(IntegrityError):
+            Author.objects.bulk_create([Author(slug='one'), ] * 2)
 
 
 class TestBlogPageViews(TestCase):
