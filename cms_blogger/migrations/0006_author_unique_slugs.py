@@ -27,7 +27,7 @@ class Migration(DataMigration):
         duplicates = Author.objects.exclude(slug='')\
             .values('slug', ).order_by('slug')\
             .annotate(cnt=models.Count('slug'))\
-            .filter(cnt__gt=1).values()
+            .filter(cnt__gt=1)
 
         duplicated_authors = Author.objects.filter(
             slug__in=[a['slug'] for a in duplicates]
