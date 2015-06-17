@@ -53,6 +53,3 @@ ALLOWED_SITES_FOR_USER = getattr(
 
 BLOGS_URL_PREFIX = getattr(
     settings, 'BLOGGER_BLOGS_URL_PREFIX', 'blogs')
-
-USE_CKEDITOR = getattr(
-    settings, 'USE_CKEDITOR', "ckeditor" in settings.INSTALLED_APPS)

@@ -36,7 +36,7 @@ from .widgets import (
 from .slug import get_unique_slug
 from .utils import (
     user_display_name, get_allowed_sites, set_cms_site, get_current_site)
-from .settings import DISALLOWED_ENTRIES_SLUGS, USE_CKEDITOR
+from .settings import DISALLOWED_ENTRIES_SLUGS
 from cms.templatetags.cms_admin import admin_static_url
 from django.contrib.admin.templatetags.admin_static import static
 import json
@@ -549,6 +549,12 @@ def _get_text_editor_widget():
     installed_plugins = plugin_pool.get_all_plugins()
     plugins = [plugin for plugin in installed_plugins if plugin.text_enabled]
 
+    try:
+        from cms.plugins.text.widgets.ckeditor_widget import CKEditor
+        return CKEditor(installed_plugins=plugins)
+    except ImportError:
+        pass
+
     if USE_TINYMCE and "tinymce" in settings.INSTALLED_APPS:
         from cms.plugins.text.widgets.tinymce_widget import TinyMCEEditor
         return TinyMCEEditor(installed_plugins=plugins, mce_attrs={
@@ -564,9 +570,6 @@ def _get_text_editor_widget():
             'theme_advanced_toolbar_align': 'left',
             'setup': 'tinyMCESetup'
         })
-    elif USE_CKEDITOR and "ckeditor" in settings.INSTALLED_APPS:
-        from cms.plugins.text.widgets.ckeditor_widget import CKEditor
-        return CKEditor(installed_plugins=plugins)
     else:
         return WYMEditor(installed_plugins=plugins)
 
