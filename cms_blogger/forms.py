@@ -14,7 +14,7 @@ from django.db import router
 from django.db.models.query import EmptyQuerySet
 
 from cms.plugin_pool import plugin_pool
-from cms.plugins.text.settings import USE_TINYMCE
+from cms.plugins.text.settings import USE_TINYMCE, USE_CKEDITOR
 from cms.plugins.text.widgets.wymeditor_widget import WYMEditor
 from cms.utils.plugins import get_placeholders
 from cms.models import Page, Title
@@ -564,6 +564,9 @@ def _get_text_editor_widget():
             'theme_advanced_toolbar_align': 'left',
             'setup': 'tinyMCESetup'
         })
+    elif USE_CKEDITOR and "ckeditor" in settings.INSTALLED_APPS:
+        from cms.plugins.text.widgets.ckeditor_widget import CKEditor
+        return CKEditor(installed_plugins=plugins)
     else:
         return WYMEditor(installed_plugins=plugins)
 
