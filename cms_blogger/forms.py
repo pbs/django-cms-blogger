@@ -14,7 +14,7 @@ from django.db import router
 from django.db.models.query import EmptyQuerySet
 
 from cms.plugin_pool import plugin_pool
-from cms.plugins.text.settings import USE_TINYMCE, USE_CKEDITOR
+from cms.plugins.text.settings import USE_TINYMCE
 from cms.plugins.text.widgets.wymeditor_widget import WYMEditor
 from cms.utils.plugins import get_placeholders
 from cms.models import Page, Title
@@ -36,7 +36,7 @@ from .widgets import (
 from .slug import get_unique_slug
 from .utils import (
     user_display_name, get_allowed_sites, set_cms_site, get_current_site)
-from .settings import DISALLOWED_ENTRIES_SLUGS
+from .settings import DISALLOWED_ENTRIES_SLUGS, USE_CKEDITOR
 from cms.templatetags.cms_admin import admin_static_url
 from django.contrib.admin.templatetags.admin_static import static
 import json
