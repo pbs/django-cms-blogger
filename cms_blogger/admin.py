@@ -386,6 +386,12 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     formfield_overrides = {
         models.BooleanField: {'widget': ToggleWidget}
     }
+
+    add_form_fieldsets = (
+        (None, {
+            'fields': ['blog', ],
+        }),
+    )
     change_form_fieldsets = (
         (None, {
             'fields': ['title', 'authors', 'short_description', ],
@@ -436,6 +442,11 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
 
     class Media:
         js = ("cms_blogger/js/moment.min.js",)
+
+    def get_fieldsets(self, request, obj=None):
+        if obj:
+            return self.change_form_fieldsets
+        return self.add_form_fieldsets
 
     def get_changelist_form(self, request, **kwargs):
         return forms.EntryChangelistForm

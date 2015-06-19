@@ -479,7 +479,8 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         _('end publication'),
         db_index=True, blank=True, null=True,
         help_text=_('End date of publication.'))
-    is_published = models.BooleanField(_('is published'), blank=True)
+    is_published = models.BooleanField(_('is published'),
+        blank=True, default=False,)
 
     seo_title = models.CharField(
         _('SEO Title'), blank=True, max_length=120)
