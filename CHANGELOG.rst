@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision d299215 (16.06.2015, 13:58 UTC)
+----------------------------------------
+
+* LUN-2311
+
+  * authors should have unique slugs
+
+No other commits.
+
 Revision 5e91574 (04.06.2015, 17:17 UTC)
 ----------------------------------------
 
