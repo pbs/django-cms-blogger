@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision e5ac3d4 (24.06.2015, 15:11 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * values() enforcing no items to be returned
+
 Revision d299215 (16.06.2015, 13:58 UTC)
 ----------------------------------------
 
