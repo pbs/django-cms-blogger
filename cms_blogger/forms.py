@@ -549,6 +549,12 @@ def _get_text_editor_widget():
     installed_plugins = plugin_pool.get_all_plugins()
     plugins = [plugin for plugin in installed_plugins if plugin.text_enabled]
 
+    try:
+        from cms.plugins.text.widgets.ckeditor_widget import CKEditor
+        return CKEditor(installed_plugins=plugins)
+    except ImportError:
+        pass
+
     if USE_TINYMCE and "tinymce" in settings.INSTALLED_APPS:
         from cms.plugins.text.widgets.tinymce_widget import TinyMCEEditor
         return TinyMCEEditor(installed_plugins=plugins, mce_attrs={
