@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Revision 3a40c8d (03.07.2015, 14:18 UTC)
+----------------------------------------
+
+* LUN-2297
+
+  * reafctor after switched to plain js ckeditor
+  * fix CKEditor settings
+  * Switch to CKEditor in blog entry
+
+No other commits.
+
 Revision e5ac3d4 (24.06.2015, 15:11 UTC)
 ----------------------------------------
 
