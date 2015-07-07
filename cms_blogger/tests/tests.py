@@ -1,9 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.contrib.admin.util import flatten_fieldsets
 from django.contrib.admin.sites import AdminSite
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.template import Template
 from django.utils import timezone
 from django.test.client import RequestFactory
@@ -13,14 +14,14 @@ from dateutil import tz, parser
 from cms_blogger.models import *
 from cms_blogger import admin, forms
 from cms.api import create_page, add_plugin
-from cms.tests.menu import BaseMenuTest
+from cms.test_utils.testcases import SettingsOverrideTestCase
+from menus.menu_pool import menu_pool
 
 from cms_blogger.admin import BlogEntryPageAdmin
 
 from cms_layouts.models import Layout
 from cms_layouts.layout_response import LayoutResponse
 from cms_layouts.slot_finder import get_fixed_section_slots
-
 import xml.etree.ElementTree
 import urlparse
 import urllib
@@ -949,14 +950,23 @@ class TestBlogEntryModel(TestCase):
             "Hello I am a blog entry article,blog,keyword")
 
 
-class TestNavigationMenu(BaseMenuTest):
+class TestNavigationMenu(SettingsOverrideTestCase):
 
     def setUp(self):
         super(TestNavigationMenu, self).setUp()
+        if not menu_pool.discovered:
+            menu_pool.discover_menus()
+        self.old_menu = menu_pool.menus
+        menu_pool.menus = {'CMSMenu': self.old_menu['CMSMenu']}
+        menu_pool.clear(settings.SITE_ID)
         self.blog1 = Blog.objects.create(**{
             'in_navigation': True, 'title': '1', 'slug': '1'})
         self.blog2 = Blog.objects.create(**{
             'in_navigation': True, 'title': '2', 'slug': '2'})
+
+    def tearDown(self):
+        menu_pool.menus = self.old_menu
+        super(TestNavigationMenu, self).tearDown()
 
     def _menu_nodes(self):
         context = self.get_context()
@@ -1029,7 +1039,7 @@ class TestNavigationMenu(BaseMenuTest):
         self.assertEquals(len(self._menu_nodes()[0].children), 0)
 
 
-class TestAuthorModel(TestCase):
+class TestAuthorModel(TransactionTestCase):
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(

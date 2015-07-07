@@ -692,6 +692,9 @@ class RiverPlugin(CMSPlugin):
     number_of_entries = models.PositiveIntegerField(
         _('Entries to Display'), default=10)
 
+    class Meta:
+        db_table = 'cmsplugin_riverplugin'
+
     def get_entries(self):
         qs = BlogEntryPage.objects.published().filter(
             categories__name__in=self.categories.split(','),

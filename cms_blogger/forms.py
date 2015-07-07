@@ -279,6 +279,7 @@ class BlogForm(AbstractBlogForm):
 
     class Meta:
         model = Blog
+        exclude = ()
 
     def __init__(self, *args, **kwargs):
         super(BlogForm, self).__init__(*args, **kwargs)
@@ -371,6 +372,7 @@ class HomeBlogForm(AbstractBlogForm):
 
     class Meta:
         model = HomeBlog
+        exclude = ()
 
 
 class BlogLayoutMissingForm(AbstractBlogForm):
@@ -521,6 +523,7 @@ class EntryChangelistForm(forms.ModelForm):
 
     class Meta:
         model = BlogEntryPage
+        exclude = ()
 
 
 class BlogEntryPageAddForm(forms.ModelForm):
@@ -852,6 +855,7 @@ class BlogRiverForm(forms.ModelForm):
 
     class Meta:
         model = RiverPlugin
+        exclude = ()
 
 
 class MoveEntriesForm(forms.Form):
