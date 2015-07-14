@@ -13,11 +13,22 @@ function showEntryPreviewPopup(triggeringLink, admin_static_url) {
         win.document.close();
     }
 
+    function getEditorHtmlContent(){
+        if (window.tinyMCE !== undefined){
+            return tinyMCE.activeEditor.getContent();
+        }
+        var editors = (window.CKEDITOR || {'instances': []}).instances
+        for (var ed in editors) {
+            return editors[ed].getData();
+        }
+        return "No editor content available."
+    }
+
     $.ajax({
         type: "POST",
         datatype: "text",
         url: triggeringLink.href,
-        data: { "body": tinyMCE.activeEditor.getContent() },
+        data: { "body": getEditorHtmlContent() },
         success: function(data) {
             win.document.open();
             win.document.write(data);
