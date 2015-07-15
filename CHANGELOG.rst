@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 677b20b (15.07.2015, 07:32 UTC)
+----------------------------------------
+
+* LUN-2423
+
+  * Fixed preview entry body.
+
+No other commits.
+
 Revision 3a40c8d (03.07.2015, 14:18 UTC)
 ----------------------------------------
 
