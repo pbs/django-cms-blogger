@@ -29,10 +29,6 @@ class EntriesQuerysetMixin(object):
         return self.filter(is_published=False)
 
 
-class EmptyEntriesQueryset(models.query.EmptyQuerySet, EntriesQuerysetMixin):
-    pass
-
-
 class EntriesQueryset(models.query.QuerySet, EntriesQuerysetMixin):
 
     def delete(self):
@@ -48,10 +44,7 @@ class EntriesQueryset(models.query.QuerySet, EntriesQuerysetMixin):
 
 class EntriesManager(models.Manager):
 
-    def get_empty_query_set(self):
-        return EmptyEntriesQueryset(self.model, using=self._db)
-
-    def get_query_set(self):
+    def get_queryset(self):
         return EntriesQueryset(self.model, using=self._db)
 
     #######################
@@ -59,10 +52,10 @@ class EntriesManager(models.Manager):
     #######################
 
     def on_site(self, site=None):
-        return self.get_query_set().on_site(site=site)
+        return self.get_queryset().on_site(site=site)
 
     def published(self):
-        return self.get_query_set().published()
+        return self.get_queryset().published()
 
     def unpublished(self):
-        return self.get_query_set().unpublished()
+        return self.get_queryset().unpublished()

@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from django.db import router
-from django.db.models.query import EmptyQuerySet
 
 from cms.plugin_pool import plugin_pool
 from cms.plugins.text.settings import USE_TINYMCE
@@ -280,6 +279,7 @@ class BlogForm(AbstractBlogForm):
 
     class Meta:
         model = Blog
+        exclude = ()
 
     def __init__(self, *args, **kwargs):
         super(BlogForm, self).__init__(*args, **kwargs)
@@ -372,6 +372,7 @@ class HomeBlogForm(AbstractBlogForm):
 
     class Meta:
         model = HomeBlog
+        exclude = ()
 
 
 class BlogLayoutMissingForm(AbstractBlogForm):
@@ -522,6 +523,7 @@ class EntryChangelistForm(forms.ModelForm):
 
     class Meta:
         model = BlogEntryPage
+        exclude = ()
 
 
 class BlogEntryPageAddForm(forms.ModelForm):
@@ -619,7 +621,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple(),
         help_text=_("Check all the categories to apply to this "
                     "post. Uncheck to remove."),
-        queryset=BlogCategory.objects.get_empty_query_set(), required=False)
+        queryset=BlogCategory.objects.none(), required=False)
 
     publish = ButtonField(widget=ButtonWidget(
         submit=True,
@@ -725,7 +727,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
 
     def clean_title(self):
         title = self.cleaned_data.get('title').strip()
-        empty_qs = BlogEntryPage.objects.get_empty_query_set()
+        empty_qs = BlogEntryPage.objects.none()
         # slug is generated only the first time
         if not self.instance.slug:
             slug = get_unique_slug(self.instance, title, empty_qs)
@@ -859,6 +861,7 @@ class BlogRiverForm(forms.ModelForm):
 
     class Meta:
         model = RiverPlugin
+        exclude = ()
 
 
 class MoveEntriesForm(forms.Form):
@@ -869,16 +872,16 @@ class MoveEntriesForm(forms.Form):
         initial=True,
         required=False)
     entries = forms.ModelMultipleChoiceField(
-        queryset=EmptyQuerySet(),
-        initial=EmptyQuerySet(),
+        queryset=BlogEntryPage.objects.none(),
+        initial=BlogEntryPage.objects.none(),
         widget=forms.CheckboxSelectMultiple(),
         label="The following blog entries will be "
               "moved to the destination blog",
         required=False)
 
     def __init__(self, *args, **kwargs):
-        entries = kwargs.pop('entries', EmptyQuerySet())
-        checked = kwargs.pop('checked', EmptyQuerySet())
+        entries = kwargs.pop('entries', BlogEntryPage.objects.none())
+        checked = kwargs.pop('checked', BlogEntryPage.objects.none())
         destination_blog = kwargs.pop('destination_blog', None)
         super(MoveEntriesForm, self).__init__(*args, **kwargs)
         self.fields['destination_blog'] = forms.ModelChoiceField(

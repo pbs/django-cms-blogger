@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.contenttypes.generic import GenericTabularInline
@@ -60,7 +60,7 @@ class AbstractBlogLayoutInline(GenericTabularInline):
     def layout_customization(self, obj):
         if obj.id:
             pattern = 'admin:%s_%s_change' % (obj._meta.app_label,
-                                              obj._meta.module_name)
+                                              obj._meta.model_name)
             url = reverse(pattern,  args=[obj.id])
             url_tag = ("<a href='%s' id='add_layout_id_%s' "
                        "onclick='return showAddAnotherPopup(this);'>"
@@ -134,7 +134,7 @@ class AbstractBlogAdmin(AdminHelper):
         if obj.id:
             nav_node = obj.navigation_node
             request = getattr(obj, '_request_for_navigation_preview', None)
-            info = self.model._meta.app_label, self.model._meta.module_name
+            info = self.model._meta.app_label, self.model._meta.model_name
             url = reverse('admin:cms_blogger-%s-%s-navigation-tool' % info,
                           args=[obj.id])
             output = []
@@ -207,7 +207,7 @@ class AbstractBlogAdmin(AdminHelper):
 
     def get_urls(self):
         urls = super(AbstractBlogAdmin, self).get_urls()
-        info = self.model._meta.app_label, self.model._meta.module_name
+        info = self.model._meta.app_label, self.model._meta.model_name
         url_patterns = patterns(
             '',
             url(r'^(?P<blog_id>\d+)/navigation_tool/$',
@@ -343,8 +343,8 @@ class HomeBlogAdmin(AbstractBlogAdmin):
     )
 
     ### PERMISSIONS ###
-    def queryset(self, request):
-        qs = super(HomeBlogAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        qs = super(HomeBlogAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         return qs.filter(site__in=get_allowed_sites(request, self.model))
@@ -386,6 +386,12 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     formfield_overrides = {
         models.BooleanField: {'widget': ToggleWidget}
     }
+
+    add_form_fieldsets = (
+        (None, {
+            'fields': ['blog', ],
+        }),
+    )
     change_form_fieldsets = (
         (None, {
             'fields': ['title', 'authors', 'short_description', ],
@@ -437,19 +443,24 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     class Media:
         js = ("cms_blogger/js/moment.min.js",)
 
+    def get_fieldsets(self, request, obj=None):
+        if obj:
+            return self.change_form_fieldsets
+        return self.add_form_fieldsets
+
     def get_changelist_form(self, request, **kwargs):
         return forms.EntryChangelistForm
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
+    def change_view(self, request, *args, **kwargs):
         response = super(BlogEntryPageAdmin, self).change_view(
-            request, object_id, form_url, extra_context)
+            request, *args, **kwargs)
         if hasattr(response, 'context_data'):
             context = response.context_data
             context['media'] = self._upgrade_jquery(context['media'])
         return response
 
-    def queryset(self, request):
-        qs = super(BlogEntryPageAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        qs = super(BlogEntryPageAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         return qs.filter(blog__allowed_users=request.user)
@@ -537,10 +548,10 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
                 'url': blog_entry.poster_image.url,
             }
             return HttpResponse(
-                json.dumps(json_response), mimetype=mimetype)
+                json.dumps(json_response), content_type=mimetype)
         except UploadException as e:
             return HttpResponse(
-                json.dumps({'error': unicode(e)}), mimetype=mimetype)
+                json.dumps({'error': unicode(e)}), content_type=mimetype)
         finally:
             if upload:
                 upload.close()

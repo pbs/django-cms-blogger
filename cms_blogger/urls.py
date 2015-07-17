@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, url, include
+from django.conf.urls import patterns, url, include
 from cms_blogger import feeds, settings
 
 # WARNING: base on the following patterns, entries with slugs in

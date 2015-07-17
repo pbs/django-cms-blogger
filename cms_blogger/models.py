@@ -300,8 +300,8 @@ class Blog(AbstractBlog):
         _("slug"), max_length=50, help_text=_('Blog Slug'))
 
     entries_slugs_with_date = models.BooleanField(
-        _("Dates in blog entry URLs"),
-        help_text=_('Blog Entries With Slugs'))
+        _("Dates in blog entry URLs"), default=False,
+        help_text=_('Blog Entries With Slugs'),)
     # permission system
     allowed_users = models.ManyToManyField(User, verbose_name=_("Add Users"))
     # social media integration
@@ -479,7 +479,8 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         _('end publication'),
         db_index=True, blank=True, null=True,
         help_text=_('End date of publication.'))
-    is_published = models.BooleanField(_('is published'), blank=True)
+    is_published = models.BooleanField(_('is published'),
+        blank=True, default=False,)
 
     seo_title = models.CharField(
         _('SEO Title'), blank=True, max_length=120)
@@ -672,9 +673,6 @@ class BlogCategory(models.Model, BlogRelatedPage):
                 self, self.name, unique_qs, keep_connection_words=False)
         super(BlogCategory, self).save(*args, **kwargs)
 
-    def __unicode__(self):
-        return self.name
-
     class Meta:
         unique_together = (("slug", 'blog'),)
 
@@ -693,6 +691,9 @@ class RiverPlugin(CMSPlugin):
     paginate_entries = models.BooleanField(default=True)
     number_of_entries = models.PositiveIntegerField(
         _('Entries to Display'), default=10)
+
+    class Meta:
+        db_table = 'cmsplugin_riverplugin'
 
     def get_entries(self):
         qs = BlogEntryPage.objects.published().filter(
