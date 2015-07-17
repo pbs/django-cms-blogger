@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+Revision b7627f5 (17.07.2015, 14:40 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * pinned version for filer pbs fork
+  * tox: Don't allow django 1.8 prereleases
+  * Django 1.7 upgrade: fixed entry changed form css namespace
+  * Django 1.7 upgrade: fixed tests; added migrations; fixed deprecation warnings
+  * Django 1.6 upgrade; fixed boolean field default; fixed admin form max rec depth
+  * Django 1.6 upgrade: fixed imports; querysests vars
+
 Revision 677b20b (15.07.2015, 07:32 UTC)
 ----------------------------------------
 
