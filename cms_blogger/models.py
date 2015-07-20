@@ -556,7 +556,7 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
                 'year': self.publication_date.year,
                 'month': self.publication_date.strftime('%m'),
                 'day': self.publication_date.strftime('%d'),
-                'entry_slug': self.slug}
+                'entry_slug': self.slug or '<missing>'}
             )
         return ('cms_blogger.views.entry_or_bio_page', (), {
             'blog_slug': self.blog.slug,
