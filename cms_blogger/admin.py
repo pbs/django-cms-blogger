@@ -757,7 +757,10 @@ def _move_entries(destination_blog, entries_ids, mirror_categories=True):
         e.save()
 
     # link entries foreign key to the new blog
-    entries.exclude(id__in=saved_entries_ids).update(blog=destination_blog)
+    to_update = entries.exclude(id__in=saved_entries_ids)\
+        .values_list('id', flat=True)
+    BlogEntryPage.objects.filter(id__in=list(to_update))\
+        .update(blog=destination_blog)
 
     # performance improvement getting previous_categories in dict
     for blogentry in BlogEntryPage.objects.filter(id__in=entries_ids):
