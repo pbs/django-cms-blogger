@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+Revision 7bd69b1 (21.07.2015, 11:41 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Fixed "You can't specify target table for update in FROM clause on mysql backend"
+  * Django recommends using __unicode__: https://docs.djangoproject.com/en/1.8/ref/unicode/#choosing-between-str-and-unicode
+  * fixed categories widget on blog entry form
+  * Django 1.7: fixed empty slug for reverse
+  * Django 1.7: fixed empty slug for reverse
+
 Revision b7627f5 (17.07.2015, 14:40 UTC)
 ----------------------------------------
 
