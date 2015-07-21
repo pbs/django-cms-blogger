@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import force_bytes
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -674,10 +673,8 @@ class BlogCategory(models.Model, BlogRelatedPage):
                 self, self.name, unique_qs, keep_connection_words=False)
         super(BlogCategory, self).save(*args, **kwargs)
 
-    def __str__(self):
-        # Note use of django.utils.encoding.force_bytes() here because
-        # name will be unicode string.
-        return force_bytes(self.name or "<Empty name>")
+    def __unicode__(self):
+        return self.name or u"<Empty name>"
 
     class Meta:
         unique_together = (("slug", 'blog'),)
