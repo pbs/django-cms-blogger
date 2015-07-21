@@ -673,6 +673,9 @@ class BlogCategory(models.Model, BlogRelatedPage):
                 self, self.name, unique_qs, keep_connection_words=False)
         super(BlogCategory, self).save(*args, **kwargs)
 
+    def __unicode__(self):
+        return self.name or u"<Empty name>"
+
     class Meta:
         unique_together = (("slug", 'blog'),)
 
