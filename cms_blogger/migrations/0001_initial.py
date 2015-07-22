@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=255, verbose_name='title')),
                 ('slug', models.SlugField(help_text="Used to build the entry's URL.", max_length=255, verbose_name='slug')),
                 ('publication_date', models.DateTimeField(default=django.utils.timezone.now, help_text="Used to build the entry's URL.", verbose_name='publication date', db_index=True)),
-                ('poster_image', models.ImageField(upload_to=cms_blogger.models.upload_entry_image, verbose_name='Thumbnail Image', blank=True)),
+                ('poster_image', models.ImageField(upload_to=cms_blogger.models.upload_entry_image, storage=cms_blogger.models.get_poster_image_storage(), verbose_name='Thumbnail Image', blank=True)),
                 ('caption', models.CharField(max_length=70, null=True, verbose_name='caption', blank=True)),
                 ('credit', models.CharField(max_length=35, null=True, verbose_name='credit', blank=True)),
                 ('short_description', models.TextField(help_text='400 characters or fewer', max_length=400, verbose_name='Short Description')),

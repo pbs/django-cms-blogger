@@ -442,6 +442,10 @@ def upload_entry_image(instance, filename):
     return new_base_trimmed + new_ext
 
 
+def get_poster_image_storage():
+    return POSTER_IMAGE_STORAGE
+
+
 @blog_page
 class BlogEntryPage(getCMSContentModel(content_attr='content'),
                     BlogRelatedPage):
@@ -457,7 +461,7 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
 
     poster_image = models.ImageField(
         _("Thumbnail Image"), upload_to=upload_entry_image, blank=True,
-        storage=POSTER_IMAGE_STORAGE)
+        storage=get_poster_image_storage())
     caption = models.CharField(
         _('caption'), max_length=70, blank=True, null=True)
     credit = models.CharField(
