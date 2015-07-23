@@ -613,8 +613,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
     requires_request = True
 
     body = forms.CharField(
-        label='Blog Entry', required=True,
-        widget=_get_text_editor_widget())
+        label='Blog Entry', required=True)
     authors = AuthorsField()
     poster_image_uploader = forms.CharField(label="", widget=PosterImage())
     categories = forms.ModelMultipleChoiceField(
@@ -671,6 +670,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         self._init_publish_button()
         self._init_save_button()
         self._init_authors_field(request)
+        self.fields['body'].widget = _get_text_editor_widget()
         if not 'body' in self.initial:
             self.initial['body'] = self.instance.content_body
 
