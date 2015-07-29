@@ -225,6 +225,10 @@
                 color: $entry-subtitle-color;
                 text-transform: none;
                 font-weight: normal;
+
+                * {
+                    text-transform: none;
+                }
                 .author{
                     text-transform: none;
                     color:$entry-text-color;
