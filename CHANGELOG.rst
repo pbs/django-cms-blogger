@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+Revision 715220d (30.07.2015, 09:11 UTC)
+----------------------------------------
+
+* LUN-2307
+
+  * fixed bug with uppercase blog info
+
+* Misc commits
+
+  * Shouldn't enforce plugin discovery at forms import. Plugins should get discovered when all apps are loaded.
+  * Fixed settings based image storage so that django doesn't detect migration changes when storage gets changed
+
 Revision 7bd69b1 (21.07.2015, 11:41 UTC)
 ----------------------------------------
 
