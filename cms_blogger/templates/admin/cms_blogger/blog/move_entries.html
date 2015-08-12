@@ -4,14 +4,16 @@
 {% load url from future %}                                                      
 
 {% block breadcrumbs %}                                                         
-    <div class="breadcrumbs">                                                       
-        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>                        
-        &rsaquo;
-        <a href="{% url 'admin:index' %}cms_blogger">{% trans 'Cms_blogger' %}</a> 
-        &rsaquo;
-        <a href="{% url 'admin:cms_blogger_blogentrypage_changelist' %}">{% trans 'Blog entries' %}</a>
-        &rsaquo;
-        Move entries
+    <div class="breadcrumbs"> 
+        <ul class="breadcrumb">
+            <li>
+                <i class="ace-icon fa fa-home home-icon"></i>
+                <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+            </li>                                                      
+            <li><a href="{% url 'admin:index' %}cms_blogger">{% trans 'Cms_blogger' %}</a> </li>
+            <li><a href="{% url 'admin:cms_blogger_blogentrypage_changelist' %}">{% trans 'Blog entries' %}</a></li>
+            <li>Move entries</li>
+        </ul>
     </div> 
 {% endblock %}                                                                  
                  
