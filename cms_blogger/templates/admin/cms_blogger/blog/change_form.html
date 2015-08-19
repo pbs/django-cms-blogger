@@ -126,8 +126,15 @@ $(function() {
 {% block content_title %}
 {% if add and title %}
 {% comment %}show current site{% endcomment %}
-<h1><span class="title-site">
-{% current_site %} &#10148; </span>{{ title }}</h1>
+<div class="page-header">
+  <h1>
+     {% current_site %} 
+    <small>
+      <i class="ace-icon fa fa-angle-double-right"></i>
+      {{ title }}
+    </small>
+  </h1>
+</div>
 {% else %}
 {{ block.super }}
 {% endif %}
