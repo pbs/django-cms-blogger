@@ -404,7 +404,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
 
         ("Credit/Caption", {
             'fields': ['caption', 'credit'],
-            'classes': ('collapsible-inner', 'closed')
+            'classes': ('collapse', 'collapsible-inner', 'closed')
 
         }),
 
@@ -419,13 +419,13 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         ('Schedule Publish', {
             'fields': ['start_publication', 'schedule_publish'],
             'description': _('Schedule Start Date description'),
-            'classes': ('right-col', 'collapsible-inner', 'hide-label',
+            'classes': ('right-col', 'collapse', 'collapsible-inner', 'hide-label',
                         'closed')
         }),
         ('Schedule Unpublish', {
             'fields': ['end_publication', 'schedule_unpublish'],
             'description': _('Schedule End Date description'),
-            'classes': ('right-col', 'collapsible-inner', 'hide-label',
+            'classes': ('right-col', 'collapse', 'collapsible-inner', 'hide-label',
                         'closed')
         }),
         (None, {

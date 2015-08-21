@@ -2,25 +2,25 @@
 {% load url from future %}
 
 <div class="poster-image-container">
-    <div class="left-side">
-        <div class="title">Default Image</div>
-        <div class="help"> Image must be 16:9 aspect ratio</div>
-        <div id="upload-button" class="poster-image-button" title="{% trans 'upload files' %}"> {% trans 'Upload' %}</div>
-        <div id="delete-button" class="poster-image-button"> {% trans 'Remove' %}</div>
+    <div class="left-side pull-left">
+        <label class="no-margin-bottom">Default Image</label>
+        <div class="help-block no-margin-top"> Image must be 16:9 aspect ratio</div>
+        <div id="upload-button" class="btn btn-sm btn-primary" title="{% trans 'upload files' %}"><i class="ace-icon fa fa-upload"></i> {% trans 'Upload' %}</div>
+        <div id="delete-button" class="btn btn-sm btn-danger"> <i class="ace-icon fa fa-trash-o"></i>{% trans 'Remove' %}</div>
 
     </div>
 
-    <div id="fileInputQueue" class="right-side">
-        <div id="fileUpload" class="clipboardItem fileUploadQueueItem">
+    <div id="fileInputQueue" class="right-side pull-right">
+        <div id="fileUpload" class="clipboardItem fileUploadQueueItem thumbnail no-margin-bottom">
         {% if image_url %}
             <div>
                 <a href="{{ image_url }}" target="_blank">
-                    <img class="thumbnail" src="{{ image_url }}" />
+                    <img src="{{ image_url }}" />
                 </a>
             </div>
         {% endif %}
         </div>
-        <div class="help">
+        <div class="help help-block">
             Image thumbnail displayed after upload.
         </div>
     </div>
@@ -53,7 +53,7 @@ $(function() {
         }
     });
 
-    if($('#fileUpload .thumbnail').length){
+    if($('#fileUpload.thumbnail').length){
         $('#fileInputQueue .help').hide();
     }
 
@@ -92,7 +92,7 @@ $(function() {
             } else {
                 var html = '\
                     <a href="' + file.url + '" target="_blank">\
-                        <img class="thumbnail" src="' + file.url + '" alt="'+file.label+'"/>\
+                        <img src="' + file.url + '" alt="'+file.label+'"/>\
                     </a>';
                 $('#fileUpload').html(html);
                 $('#fileInputQueue .help').hide();

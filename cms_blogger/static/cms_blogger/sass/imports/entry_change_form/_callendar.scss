@@ -15,8 +15,6 @@
             border-radius:0;
             background:#fff;
             margin: 0 auto;
-            width: 80%;
-            padding: 5%;
             th{
                 background:none;
                 font-size: 13px;
@@ -48,7 +46,7 @@
             }
 
             .ui-slider-handle{
-                @include formButton("light-gray");
+                // @include formButton("light-gray");
                 width: 1.2em;
                 height: 1.2em;
                 padding:0;
@@ -94,38 +92,6 @@
             .ui-datepicker-header .ui-corner-all{
                 border-radius :0;
                 border-color: #cccccc;
-
-
-                &.ui-datepicker-next,
-                &.ui-datepicker-prev{
-                    background:#676767;
-                    cursor:pointer;
-                    &.ui-state-hover{
-                        background:#676767;
-                        border:0;
-                        &.ui-datepicker-prev-hover,
-                        &.ui-datepicker-next-hover{
-                            top:2px;
-                        }
-
-                        &.ui-datepicker-prev-hover{
-                            left: 2px;
-                        }
-
-                        &.ui-datepicker-next-hover{
-                            right: 2px;
-                        }
-                    }
-
-                    .ui-icon-circle-triangle-e{
-                        background-position: -32px 0px;
-                    }
-
-                    .ui-icon-circle-triangle-w{
-                        background-position: -97px 0px;
-
-                    }
-                }
             }
 
             .ui-datepicker-header{

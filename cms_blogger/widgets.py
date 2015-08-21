@@ -91,7 +91,7 @@ class ButtonWidget(forms.widgets.CheckboxInput):
 
     make_js_button = (
         "<script type='text/javascript'>"
-        "jQuery('#id_%s').button().click(function(event) {"
+        "jQuery('#id_%s').addClass('default btn btn-primary').click(function(event) {"
         "event.preventDefault();%s});"
         "</script>")
     submit_on_click_js = (
