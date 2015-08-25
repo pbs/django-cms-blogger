@@ -4,12 +4,27 @@
 {% block breadcrumbs %}
 {% endblock %}
 
-{% block pretitle %}<p class="help">Currently on site: {% current_site %}</p>{% endblock %}
-
+{% block content_title %}
+        {% if title %}
+          <div class="page-header">
+            <h1>
+                {{ title }}
+                <small>
+                    <i class="ace-icon fa fa-angle-double-right"></i>
+                    Currently on site: {% current_site %}
+                </small>
+            </h1>
+          </div>
+        {% endif %}
+      {% endblock %} 
 {% block extrastyle %}
+{{block.super}}
+
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}cms_blogger/css/jqtree.css">
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}cms_blogger/css/jqtree-extension.css">
+
 {% endblock %}
+
 {% block extrahead %}
 <script type="text/javascript" src="{{STATIC_URL}}cms_blogger/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}cms_blogger/js/tree.jquery.js"></script>
@@ -77,20 +92,21 @@ $(function() {
     tree.bind( 'tree.select', function(event) {
         if (!event.node) {
             tree.tree('selectNode', event.previous_node)
-        }});
+        }
+    });
 });
 </script>
 {% endblock %}
 
 {% block content %}
 <div id='nav-tree'></div>
-<p class="help">Click on the green box to edit the text that will appear in your site's menu.</p>
+<p class="help">Click on the blue box to edit the text that will appear in your site's menu.</p>
 <p class="help">Click and hold on the green box to drag the blog into the desired spot in the menu.</p>
 <form action="." method="post">
 {% csrf_token %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-<div class="submit-row">
-<input type="submit" value="Save" class="default" name="_save" id='submit-form'>
+<div class="submit-row form-actions text-right no-margin-bottom no-background">
+<input type="submit" value="Save" class="btn btn-primary" name="_save" id='submit-form'>
 </div>
 <script type="text/javascript">
 $(document).ready(function(){

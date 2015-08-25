@@ -6,6 +6,7 @@
 <style type="text/css">
 form ul.tagit {
     padding: 1px 5px;
+    display: inline-block;
 }
 form ul.tagit li{
     font-size: 13px;
@@ -14,10 +15,6 @@ form ul.tagit li.tagit-choice.active-tag {
     background: white;
     border-width: medium;
     padding: 1px 18px 0 .5em;
-}
-#category-slug a{
-    color: #5b80b2;
-    text-decoration: underline;
 }
 
 #id_navigation_node_pretty .current-node{
@@ -67,12 +64,7 @@ form ul.tagit li.tagit-choice.active-tag {
     font-size: small;
     font-weight: normal;
 }
-#category-slug {
-    padding: 5px;
-    color: #2e6e9e;
-    display: none;
-    margin-left: 105px;
-}
+
 </style>
 {% endblock %}
 
@@ -83,36 +75,6 @@ form ul.tagit li.tagit-choice.active-tag {
 <![endif]-->
 <script type="text/javascript" src="{{ STATIC_URL }}cms_blogger/js/popupHandler.js"></script>
 <script type="text/javascript">
-$(function() {
-    $(".help-tooltip")
-        .addClass("ui-state-default")
-        .css({
-            "position": "relative", "padding-left": "25px",
-            "background": "none", "border": "none", "font-size": "10px",
-            "white-space": "nowrap", "display": "inline-block", "margin":"5px 0"
-        })
-        .prepend(
-            $("<span>")
-                .addClass("ui-state-default ui-corner-all ui-icon ui-icon-help")
-                .css({
-                    "margin-left": "-25px",
-                    "margin-right": "5px",
-                    "display": "inline-block",
-                    "vertical-align": "middle"
-                })
-        )
-        .before('<br />')
-        .tooltip({
-            position: { my: "right bottom", at: "center top" },
-            content: function() {
-                var text = $(this).attr('title');
-                return text.replace(/STATIC_URL/g, '{{STATIC_URL}}')
-            },
-            open: function (event, ui) {
-                ui.tooltip.css({"max-width": "700px",});
-            }
-        });
-});
 {% if not add %}
     var current_site = {{adminform.form.instance.site_id}};
 {% endif %}
@@ -169,7 +131,7 @@ $(function() {
         django.jQuery(document).ready(function() {
             var for_module_id = '{{ inline_admin_formset.formset.prefix }}-group';
             var description = "{{inline_admin_formset.opts.description|safe}}";
-            var style = "padding-bottom: 10px; border-bottom: 1px solid #eee;"
+            var style = "padding:10px 8px;"
             django.jQuery("#" + for_module_id + " h2").first().after(
                 "<div class='description' style='" + style + "'>" + description + "</div>" );
         })
@@ -190,7 +152,7 @@ $(function() {
     });
 })(django.jQuery);
 </script>
-<div class="submit-row">
+<div class="submit-row form-actions text-right no-margin-bottom no-background">
 <input type="submit" value="{% trans 'Next' %}" name="_continue" {{ onclick_attrib }}/>
 </div>
 {% else %}

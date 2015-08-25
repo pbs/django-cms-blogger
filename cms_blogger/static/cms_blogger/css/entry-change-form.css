@@ -5,14 +5,14 @@
 
 /* line 5, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage div.main-col {
-  width: 83.33333%;
+  width: 78%;
   float: left;
   border: none;
   padding-right: 15px;
 }
 /* line 12, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage div.main-col + div.right-col {
-  width: 16.66667%;
+  width: 22%;
   float: right;
 }
 /* line 16, ../sass/imports/entry_change_form/_layout.scss */
@@ -48,7 +48,18 @@
 .app-cms_blogger.model-blogentrypage #id_body_tbl {
   border: 0 !important;
 }
+/* line 50, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage fieldset.form-horizontal textarea, .app-cms_blogger.model-blogentrypage fieldset.form-horizontal input[type="text"],
+.app-cms_blogger.model-blogentrypage fieldset.form-horizontal input[type="password"], .app-cms_blogger.model-blogentrypage fieldset.form-horizontal input[type="datetime"],
+.app-cms_blogger.model-blogentrypage fieldset.form-horizontal input[type="datetime-local"], .app-cms_blogger.model-blogentrypage fieldset.form-horizontal input[type="date"],
+.app-cms_blogger.model-blogentrypage fieldset.form-horizontal select {
+  width: 90%;
+}
 /* line 56, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage fieldset.form-horizontal .select2-container {
+  width: 90% !important;
+}
+/* line 65, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .poster-image {
   padding: 19px;
   margin-bottom: 20px;
@@ -57,102 +68,135 @@
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
   margin-left: 25.5%;
-  width: 41%;
+  width: 67%;
 }
-/* line 66, ../sass/imports/entry_change_form/_layout.scss */
+/* line 75, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .poster-image .widget-body {
   background: transparent;
 }
-/* line 70, ../sass/imports/entry_change_form/_layout.scss */
+/* line 79, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .poster-image .field-poster_image_uploader .control-label {
   display: none;
 }
-/* line 73, ../sass/imports/entry_change_form/_layout.scss */
+/* line 82, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .poster-image .field-poster_image_uploader .col-sm-9 {
   width: 100%;
 }
-/* line 78, ../sass/imports/entry_change_form/_layout.scss */
+/* line 87, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage #fileInputQueue {
-  width: 300px;
+  width: 50%;
 }
-/* line 81, ../sass/imports/entry_change_form/_layout.scss */
+/* line 90, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage #fileInputQueue .thumbnail {
   width: 100%;
 }
-/* line 85, ../sass/imports/entry_change_form/_layout.scss */
+/* line 94, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage #fileUpload {
-  width: 300px;
-  height: 173px;
+  width: 50%;
+  min-height: 200px;
   background: white;
 }
-/* line 90, ../sass/imports/entry_change_form/_layout.scss */
+/* line 99, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .body-wrapper {
   margin-left: 25.5%;
-  width: 41%;
+  width: 67%;
 }
-/* line 94, ../sass/imports/entry_change_form/_layout.scss */
+/* line 103, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .body-wrapper .control-label {
   display: none;
 }
-/* line 97, ../sass/imports/entry_change_form/_layout.scss */
+/* line 106, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .body-wrapper .col-sm-9 {
   width: 100%;
   padding: 0;
 }
-/* line 101, ../sass/imports/entry_change_form/_layout.scss */
+/* line 110, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .body-wrapper .field-preview_on_top, .app-cms_blogger.model-blogentrypage .body-wrapper .field-preview_on_bottom {
   margin-left: 0;
   margin-right: 0;
 }
-/* line 106, ../sass/imports/entry_change_form/_layout.scss */
+/* line 115, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .custom-collapse {
   background: white;
 }
-/* line 109, ../sass/imports/entry_change_form/_layout.scss */
+/* line 118, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .custom-collapse .widget-body {
   margin-top: 15px;
 }
-/* line 113, ../sass/imports/entry_change_form/_layout.scss */
+/* line 122, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .custom-collapse.collapsed .header.block {
   background-color: #fff !important;
   border-color: #ccc !important;
+  font-size: 15px !important;
 }
-/* line 120, ../sass/imports/entry_change_form/_layout.scss */
+/* line 130, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .right-col .widget-body {
   background: transparent;
 }
-/* line 124, ../sass/imports/entry_change_form/_layout.scss */
+/* line 134, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .right-col .form-horizontal:first-child .control-label {
   display: none;
 }
-/* line 127, ../sass/imports/entry_change_form/_layout.scss */
+/* line 137, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .right-col .form-horizontal:first-child .col-sm-9 {
   width: 100%;
 }
-/* line 131, ../sass/imports/entry_change_form/_layout.scss */
+/* line 141, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .right-col .description {
   margin-bottom: 10px;
 }
-/* line 134, ../sass/imports/entry_change_form/_layout.scss */
+/* line 144, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .right-col .custom-collapse .widget-body {
   padding: 15px;
   margin-top: 0;
 }
-/* line 138, ../sass/imports/entry_change_form/_layout.scss */
+/* line 148, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage .right-col .custom-collapse .widget-body input[type="text"] {
   width: 100%;
 }
-/* line 143, ../sass/imports/entry_change_form/_layout.scss */
+/* line 152, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage .right-col .field-categories .categ-wrapper {
+  border: 1px solid #d5d5d5;
+  height: 170px;
+  padding: 0;
+  width: 90%;
+  float: left;
+  background: white;
+  padding: 6px 15px 5px;
+}
+/* line 161, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage .right-col .field-categories .categ-wrapper ul {
+  margin: 0;
+}
+/* line 165, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage .right-col .field-categories, .app-cms_blogger.model-blogentrypage .right-col .field-seo_title, .app-cms_blogger.model-blogentrypage .right-col .field-meta_keywords {
+  margin-bottom: 0;
+}
+/* line 168, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage .right-col .field-categories .control-label, .app-cms_blogger.model-blogentrypage .right-col .field-seo_title .control-label, .app-cms_blogger.model-blogentrypage .right-col .field-meta_keywords .control-label {
+  width: 100%;
+  text-align: left;
+}
+/* line 172, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage .right-col .field-categories .col-sm-9, .app-cms_blogger.model-blogentrypage .right-col .field-seo_title .col-sm-9, .app-cms_blogger.model-blogentrypage .right-col .field-meta_keywords .col-sm-9 {
+  width: 100%;
+}
+/* line 177, ../sass/imports/entry_change_form/_layout.scss */
+.app-cms_blogger.model-blogentrypage .right-col .field-enable_poster_image .control-label, .app-cms_blogger.model-blogentrypage .right-col .field-enable_poster_image .col-sm-9, .app-cms_blogger.model-blogentrypage .right-col .field-disqus_enabled .control-label, .app-cms_blogger.model-blogentrypage .right-col .field-disqus_enabled .col-sm-9 {
+  width: 50%;
+  text-align: left;
+}
+/* line 183, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage #id_save_button {
   background: #555 !important;
   border-color: #555 !important;
   width: 100%;
 }
-/* line 148, ../sass/imports/entry_change_form/_layout.scss */
+/* line 188, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage #id_save_button:hover {
   background-color: #303030 !important;
 }
-/* line 152, ../sass/imports/entry_change_form/_layout.scss */
+/* line 192, ../sass/imports/entry_change_form/_layout.scss */
 .app-cms_blogger.model-blogentrypage #id_publish {
   width: 100%;
 }
@@ -161,10 +205,9 @@
 .app-cms_blogger.model-blogentrypage input[type="checkbox"] {
   margin: 0;
   margin-right: 5px;
-  vertical-align: top;
   cursor: pointer;
 }
-/* line 9, ../sass/imports/entry_change_form/_checkboxes.scss */
+/* line 8, ../sass/imports/entry_change_form/_checkboxes.scss */
 .app-cms_blogger.model-blogentrypage input[type="checkbox"]:before {
   content: "";
   width: 15px;
@@ -174,16 +217,30 @@
   background: #f7f7f7;
   padding: 0;
 }
+/* line 17, ../sass/imports/entry_change_form/_checkboxes.scss */
+.app-cms_blogger.model-blogentrypage input[type="checkbox"]:checked:before {
+  display: inline-block;
+  font-family: fontAwesome;
+  content: '\f00c';
+  background: #F5F8FC !important;
+  border-color: #adb8c0;
+  float: left;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 -15px 10px -12px rgba(0, 0, 0, 0.05), inset 15px 10px -12px rgba(255, 255, 255, 0.1);
+}
 
 /* line 5, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-widget {
+  font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+/* line 8, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage #ui-datepicker-div {
   display: none;
 }
-/* line 8, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 11, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker-trigger {
   outline: none;
 }
-/* line 11, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 14, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker {
   z-index: 2000 !important;
   font-size: 13px;
@@ -192,75 +249,108 @@
   background: #fff;
   margin: 0 auto;
 }
-/* line 18, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 21, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker th {
   background: none;
   font-size: 13px;
   color: #333333;
   font-weight: normal;
 }
-/* line 24, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 27, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker.ui-widget-content {
   color: #323232;
+  box-shadow: none;
+  width: 100%;
+  margin-top: -1px;
 }
 @media all and (max-width: 768px) {
-  /* line 11, ../sass/imports/entry_change_form/_callendar.scss */
+  /* line 14, ../sass/imports/entry_change_form/_callendar.scss */
   .app-cms_blogger.model-blogentrypage .ui-datepicker {
     font-size: 17px;
   }
 }
-/* line 31, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 37, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-calendar {
   border: 0;
 }
-/* line 35, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 41, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-timepicker-div {
   padding-top: 10px;
   border-top: 1px solid #dddddd;
 }
-/* line 40, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 46, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-buttonpane {
-  padding-top: 10px;
+  padding: 10px;
+  overflow: hidden;
   background: none;
 }
-/* line 43, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 51, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-buttonpane button {
   margin: 0;
+  background: #abbac3;
+  border: 5px solid #abbac3;
+  border-radius: 0;
+  color: white;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  -webkit-transition: all ease .15s;
+  -o-transition: all ease .15s;
+  transition: all ease .15s;
+  cursor: pointer;
+  vertical-align: middle;
+  position: relative;
+  opacity: 1;
 }
-/* line 48, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 68, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-buttonpane button:hover {
+  background-color: #8b9aa3;
+}
+/* line 72, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+  background: #428bca;
+  border-color: #428bca;
+}
+/* line 76, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current:hover {
+  background-color: #1b6aaa;
+}
+/* line 83, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-slider-handle {
-  width: 1.2em;
-  height: 1.2em;
+  width: 1.45em;
+  height: 1.45em;
   padding: 0;
   cursor: move;
+  background: #f8f8f8;
+  border-color: #4aa4ce !important;
 }
-/* line 56, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 92, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker dl {
   padding: 0;
 }
-/* line 58, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 94, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker dl dt, .app-cms_blogger.model-blogentrypage .ui-datepicker dl dd {
   font-size: 13px;
   margin-top: 0;
 }
-/* line 62, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 98, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker dl dd {
   margin-bottom: 13px;
 }
-/* line 66, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 102, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker td {
   border: 0;
 }
-/* line 68, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 104, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker td span {
   background: none;
   color: #333333;
   text-align: center;
   border: 0;
 }
-/* line 74, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 110, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker td a {
-  color: #309bc5;
+  color: #323232;
   text-align: center;
   border: 0;
   background: none;
@@ -271,32 +361,47 @@
   height: 21px;
   line-height: 21px;
 }
-/* line 85, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 122, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker td a.ui-state-active {
-  background: #e7ebec;
+  background: #D5E5EF;
   border: 0;
   color: #323232;
 }
-/* line 92, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 127, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-datepicker td a:hover {
+  background: #e7ebec;
+}
+/* line 132, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-header .ui-corner-all {
   border-radius: 0;
-  border-color: #cccccc;
+  border: none;
 }
-/* line 97, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 136, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-header .ui-corner-all:hover {
+  background: #eee;
+  border: 1px solid #eee;
+}
+/* line 143, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-header {
   background: none;
   border: 0;
   color: #666666;
 }
-/* line 102, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 148, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-header .ui-datepicker-year {
   font-weight: normal;
 }
-/* line 106, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 152, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage .ui-datepicker .ui-datepicker-header .ui-datepicker-month {
   text-transform: uppercase;
 }
-/* line 113, ../sass/imports/entry_change_form/_callendar.scss */
+/* line 156, ../sass/imports/entry_change_form/_callendar.scss */
+.app-cms_blogger.model-blogentrypage .ui-datepicker .ui-slider-horizontal {
+  border-radius: 0;
+  border: none;
+  background: #D5D5D5;
+}
+/* line 163, ../sass/imports/entry_change_form/_callendar.scss */
 .app-cms_blogger.model-blogentrypage #datepicker {
   width: 100%;
   font-size: 13px;
