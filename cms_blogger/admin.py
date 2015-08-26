@@ -140,7 +140,7 @@ class AbstractBlogAdmin(AdminHelper):
                           args=[obj.id])
             output = []
             output.append(
-                u'<a href="%s" class="add-another" id="add_id_navigation_node"'
+                u'<a href="%s" class="add-another btn btn-primary btn-xs" id="add_id_navigation_node"'
                 ' onclick="return showNavigationPopup(this);"> ' % url)
             output.append(
                 u'Open Navigation Tool</a>')
