@@ -12,7 +12,6 @@
 {% endblock %}
 
 {% block pagination %}
-{{ block.super }}
 <script type="text/javascript">
 (function ($) {
     var i = 0;
@@ -21,4 +20,6 @@
     });
 })(django.jQuery);
 </script>
+
+{{ block.super }}
 {% endblock %}

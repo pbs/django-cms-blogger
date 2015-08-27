@@ -63,8 +63,9 @@ class AbstractBlogLayoutInline(GenericTabularInline):
                                               obj._meta.model_name)
             url = reverse(pattern,  args=[obj.id])
             url_tag = ("<a href='%s' id='add_layout_id_%s' "
+                       "class='btn btn-primary btn-xs "
                        "onclick='return showAddAnotherPopup(this);'>"
-                       "<input type='button' value='Customize Layout' />"
+                       "Customize Layout"
                        "</a>" % (url, obj.id))
 
             return url_tag
@@ -139,10 +140,10 @@ class AbstractBlogAdmin(AdminHelper):
                           args=[obj.id])
             output = []
             output.append(
-                u'<a href="%s" class="add-another" id="add_id_navigation_node"'
+                u'<a href="%s" class="add-another btn btn-primary btn-xs" id="add_id_navigation_node"'
                 ' onclick="return showNavigationPopup(this);"> ' % url)
             output.append(
-                u'<input type="button" value="Open Navigation Tool" /></a>')
+                u'Open Navigation Tool</a>')
             preview = self._navigation_preview(request, nav_node)
             hide = 'style="display:none"'
             if preview:
@@ -334,6 +335,7 @@ class HomeBlogAdmin(AbstractBlogAdmin):
     change_form_fieldsets = (
         (None, {
             'fields': ('site', 'title', 'tagline', 'branding_image'),
+            'classes': ('extrapretty',),
             'description': _('Home Blog Setup Description')
         }),
         ('Advanced Settings', {
@@ -404,7 +406,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
 
         ("Credit/Caption", {
             'fields': ['caption', 'credit'],
-            'classes': ('collapsible-inner', 'closed')
+            'classes': ('collapse', 'collapsible-inner', 'closed')
 
         }),
 
@@ -419,13 +421,13 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         ('Schedule Publish', {
             'fields': ['start_publication', 'schedule_publish'],
             'description': _('Schedule Start Date description'),
-            'classes': ('right-col', 'collapsible-inner', 'hide-label',
+            'classes': ('right-col', 'collapse', 'collapsible-inner', 'hide-label',
                         'closed')
         }),
         ('Schedule Unpublish', {
             'fields': ['end_publication', 'schedule_unpublish'],
             'description': _('Schedule End Date description'),
-            'classes': ('right-col', 'collapsible-inner', 'hide-label',
+            'classes': ('right-col', 'collapse', 'collapsible-inner', 'hide-label',
                         'closed')
         }),
         (None, {

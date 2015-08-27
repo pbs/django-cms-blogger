@@ -1,51 +1,58 @@
 #nav-tree{
-    border-radius: 8px;
-    border-color: transparent;
-    border-width: 1px;
-    border-style: solid;
     display: inline-block;
-    background-color: #efefef;
-    padding: 10px;
+    margin: 10px;
+    position: relative;
 }
-
+ul.jqtree-tree {
+    margin-left: 0;
+}
 #nav-tree ul .jqtree-element{
-    display: inline-block;
     white-space: nowrap;
     vertical-align: top;
-    margin-right: 10px;
-    background-color: #428bca;
-    border-radius: 8px;
     font-size: 14px;
-    color:#fff;
-    padding: 5px 7px;
-    margin-bottom: 2px;
+    display: block;
+    min-height: 38px;
+    margin: 5px 0;
+    padding: 8px 12px;
+    background: #F8FAFF;
+    border: 1px solid #DAE2EA;
+    border-left: 2px solid #428bca !important;
+    color: #7C9EB2;
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 0;
 }
 
 #nav-tree .jqtree-title{
-    color: #fff;
+    color: #1C4257;
 }
 
 ul.jqtree-tree .jqtree-toggler {
     display: none;
 }
 
-
-ul.jqtree-tree .jqtree-element {
-    width: auto;
+#nav-tree ul.jqtree-tree li.jqtree-folder li.jqtree_common .jqtree-element {
+    border-left-color: #e8b110 !important;
 }
 
 #nav-tree .jqtree-selected > .jqtree-element,
-#nav-tree .jqtree-dragging{
+#nav-tree .jqtree-dragging, 
+#nav-tree .jqtree-moving {
     background-image: none;
-    background-color: #a2cc28;
+    background-color: #428bca;
+    padding: 0;
+    border-radius: 0 !important;
+    color: white;
+    border-left-width: 0px !important;
 }
-
-#nav-tree .jqtree-dragging{
-    border-radius: 8px;
+#nav-tree .jqtree-dragging {
+    height: 38px;
+    line-height: 28px;
     font-size: 14px;
-    color:#fff;
+    color: #fff;
     padding: 5px 7px;
     opacity: 1;
+    width: 100%;
 }
 
 ul.jqtree-tree span.jqtree-border{
@@ -76,22 +83,41 @@ ul.jqtree-tree ul.jqtree_common{
 
 
 #nav-tree span.inplace-editor{
-    border-radius: 3px;
-    border: 1px dashed green;
-    padding: 1px;
+    display: block;
+    padding: 8px 12px;
+    color: white;
+    text-shadow: none;
 }
 
 #nav-tree span.inplace-hovered{
     border-radius: 3px;
-    background-color: green;
     border: 1px dashed white;
-    padding: 1px;
+    color: white;
+    background: #64A2CA;
+    padding: 7px 12px;
 }
 
 #nav-tree ul li input.editInPlace-active{
     color: black;
 }
-
-#nav-tree ul li div.blog-node{
-    background-color: #8fbc8f;
+#nav-tree ul.jqtree-tree li.jqtree-folder li.jqtree_common .jqtree-element.blog-node{
+    background-color: #fee188;
+    border-left-color: #fee188 !important;
+}
+#nav-tree ul li div.blog-node .jqtree-title {
+    color: #963!important;
+}
+#nav-tree span.editInPlace-active {
+    border: none !important;
+}
+#nav-tree .inplace_field {
+    margin-right: 10px;
+}
+#nav-tree .inplace_save, #nav-tree .inplace_cancel {
+    background: transparent;
+    border: solid 1px white;
+    font-weight: 300;
+}
+#nav-tree .inplace_save:hover, #nav-tree .inplace_cancel:hover {
+    background: #1b6aaa;
 }

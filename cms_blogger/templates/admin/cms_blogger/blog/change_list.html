@@ -3,35 +3,20 @@
 
 {% block content_title %}
 {% if title %}
-<h1>
-<span class="title-site">
-{% if not cl.has_access_to_multiple_sites %}
-    {{ cl.sites.0.name }}
-{% else %}
-    {{ cl.current_site.name }}
+<div class="page-header">
+  <h1>
+      {% if not cl.has_access_to_multiple_sites %}
+        {{ cl.sites.0.name }}
+      {% else %}
+        {{ cl.current_site.name }}
+      {% endif %}
+    <small>
+      <i class="ace-icon fa fa-angle-double-right"></i>
+      {{ title }}
+    </small>
+  </h1>
+</div>
 {% endif %}
-&#10148;
-</span>
-{{ title }}
-</h1>
-{% endif %}
-{% endblock %}
-
-{% block extrastyle %}
-{{block.super}}
-<style type="text/css">
-#site-selector {
-    float:left;
-    margin-top:2px;
-    margin-left:5px;
-    margin-right:10px;
-}
-
-.title-site{
-    font-size: small;
-    font-weight: normal;
-}
-</style>
 {% endblock %}
 
 {% block extrahead %}
@@ -50,7 +35,7 @@ CMS.$(document).bind('ready.cms_blogger', function(){
 })
 </script>
 {% endblock %}
-
+{% block coltype %}{{block.super}} with-site-selector{% endblock %} 
 {% block search %}
 {% if cl.has_access_to_multiple_sites %}
     <div id="site-selector">{{cl.opts.verbose_name_plural|capfirst}} on:

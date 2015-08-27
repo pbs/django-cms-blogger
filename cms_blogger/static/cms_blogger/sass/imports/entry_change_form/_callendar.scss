@@ -2,6 +2,9 @@
 // overrides the default jquery css
 @mixin callendar($ns){
     #{$ns}{
+        .ui-widget {
+            font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
         #ui-datepicker-div{
             display: none;
         }
@@ -15,8 +18,6 @@
             border-radius:0;
             background:#fff;
             margin: 0 auto;
-            width: 80%;
-            padding: 5%;
             th{
                 background:none;
                 font-size: 13px;
@@ -25,6 +26,9 @@
             }
             &.ui-widget-content{
                 color: #323232;
+                box-shadow: none;
+                width: 100%;
+                margin-top: -1px;
             }
             @media all and (max-width:768px) {
                 font-size: 17px;
@@ -40,19 +44,49 @@
             }
 
             .ui-datepicker-buttonpane{
-                padding-top:10px;
-                background:none;
+                padding: 10px;
+                overflow: hidden;
+                background: none;
+
                 button{
                     margin: 0;
+                    background: #abbac3;
+                    border: 5px solid #abbac3;
+                    border-radius: 0;
+                    color: white;
+                    text-shadow: 0 -1px 0 rgba(0,0,0,.25)!important;
+                    border-radius: 0;
+                    box-shadow: none!important;
+                    -webkit-transition: all ease .15s;
+                    -o-transition: all ease .15s;
+                    transition: all ease .15s;
+                    cursor: pointer;
+                    vertical-align: middle;
+                    position: relative;
+                    opacity: 1;
+
+                    &:hover {
+                        background-color: #8b9aa3;
+                    }
+
+                    &.ui-datepicker-current {
+                    background: #428bca;
+                    border-color: #428bca;
+
+                        &:hover {
+                            background-color: #1b6aaa;
+                        }
+                    }
                 }
             }
 
             .ui-slider-handle{
-                @include formButton("light-gray");
-                width: 1.2em;
-                height: 1.2em;
+                width: 1.45em;
+                height: 1.45em;
                 padding:0;
                 cursor: move;
+                background: #f8f8f8;
+                border-color: #4aa4ce!important;
             }
 
             dl{
@@ -74,7 +108,7 @@
                     border:0;
                 }
                 a{
-                    color:#309bc5;
+                    color: #323232;;
                     text-align: center;
                     border:0;
                     background:none;
@@ -84,47 +118,25 @@
                     width:21px;
                     height: 21px;
                     line-height: 21px;
-                    &.ui-state-active{
-                        background:#e7ebec;
+
+                    &.ui-state-active {
+                        background:#D5E5EF;
                         border:0;
                         color: #323232;
+                    }
+                    &:hover {
+                        background: #e7ebec;
                     }
                 }
             }
             .ui-datepicker-header .ui-corner-all{
                 border-radius :0;
-                border-color: #cccccc;
+                border: none;
 
+                &:hover {
+                    background: #eee;
+                    border: 1px solid #eee;
 
-                &.ui-datepicker-next,
-                &.ui-datepicker-prev{
-                    background:#676767;
-                    cursor:pointer;
-                    &.ui-state-hover{
-                        background:#676767;
-                        border:0;
-                        &.ui-datepicker-prev-hover,
-                        &.ui-datepicker-next-hover{
-                            top:2px;
-                        }
-
-                        &.ui-datepicker-prev-hover{
-                            left: 2px;
-                        }
-
-                        &.ui-datepicker-next-hover{
-                            right: 2px;
-                        }
-                    }
-
-                    .ui-icon-circle-triangle-e{
-                        background-position: -32px 0px;
-                    }
-
-                    .ui-icon-circle-triangle-w{
-                        background-position: -97px 0px;
-
-                    }
                 }
             }
 
@@ -141,7 +153,11 @@
                     text-transform: uppercase;
                 }
             }
-
+            .ui-slider-horizontal {
+                border-radius: 0;
+                border: none;
+                background: #D5D5D5;
+            }
 
         }
         #datepicker {

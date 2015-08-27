@@ -9,39 +9,14 @@ from .settings import (MAXIMUM_THUMBNAIL_FILE_SIZE,
 
 class ToggleWidget(forms.widgets.CheckboxInput):
 
-    class Media:
-        css = {
-            'all': (
-                static('cms_blogger/css/toggle-to-right.css'),
-                static('cms_blogger/css/toggles-light.css'),)
-        }
-        js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
-              static('cms_blogger/js/toggles.min.js'),)
-
-    toggle_script = (
-        "<script type='text/javascript'> jQuery("
-        "function(){jQuery('.toggle_%s').toggles({"
-        "checkbox: jQuery('#id_%s'), "
-        "click: %s,"
-        "drag: %s,"
-        "height: 30,"
-        "width: 65,"
-        "on:jQuery('#id_%s').is(':checked')});});</script>")
-
-    toggle_html = (
-        '<div class="toggle-light" style="display:inline-block"> '
-        '<div class="toggle_%s toggle-select" data-type="select"> '
-        '</div></div>%s %s')
-
     def render(self, name, value, attrs={}):
-        attrs.update({'class': 'toggle', 'style': 'display:none'})
+        attrs.update({'class': 'ace ace-switch ace-switch-4 btn-empty'})
         widget_html = super(ToggleWidget, self).render(
             name, value, attrs=attrs)
         is_disabled = (self.attrs.get('disabled', False) or
                        attrs.get('disabled', False))
         active = 'false' if is_disabled else 'true'
-        script_out = self.toggle_script % (name, name, active, active, name)
-        output = self.toggle_html % (name, widget_html, script_out)
+        output = "%s" % (widget_html)
         return mark_safe(output)
 
 
@@ -91,7 +66,7 @@ class ButtonWidget(forms.widgets.CheckboxInput):
 
     make_js_button = (
         "<script type='text/javascript'>"
-        "jQuery('#id_%s').button().click(function(event) {"
+        "jQuery('#id_%s').addClass('default btn btn-primary').click(function(event) {"
         "event.preventDefault();%s});"
         "</script>")
     submit_on_click_js = (
