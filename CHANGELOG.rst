@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+Revision d72c5a3 (28.08.2015, 08:54 UTC)
+----------------------------------------
+
+* LUN-2310
+
+  * customized the -open navigation tool- button
+  * pop-up forms styled according to Ace theme
+  * updated script to a later version so it fixes the $.browser issue
+  * blogs updates to match the ace theme
+  * title updated + reorder of pagination
+  * breadcrumb updated
+
+No other commits.
+
 Revision 715220d (30.07.2015, 09:11 UTC)
 ----------------------------------------
 
