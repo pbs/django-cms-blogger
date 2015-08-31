@@ -645,7 +645,6 @@ class BlogEntryPageChangeForm(forms.ModelForm):
 
     save_button = ButtonField(widget=ButtonWidget(submit=True, text='Save'))
     preview_on_top = ButtonField(widget=ButtonWidget(text='Preview'))
-    preview_on_bottom = ButtonField(widget=ButtonWidget(text='Preview'))
 
     class Media:
         css = {"all": ("cms_blogger/css/entry-change-form.css",
@@ -704,14 +703,13 @@ class BlogEntryPageChangeForm(forms.ModelForm):
             pub_button.text = 'Save and continue'
 
     def _init_preview_buttons(self):
-        preview1 = self.fields['preview_on_top'].widget
-        preview2 = self.fields['preview_on_bottom'].widget
+        preview = self.fields['preview_on_top'].widget
         url = reverse(
             'admin:cms_blogger-entry-preview', args=[self.instance.id])
-        preview1.link_url = preview2.link_url = url
+        preview.link_url = url
         popup_js = "return showEntryPreviewPopup(this,'%s');" % (
             admin_static_url(), )
-        preview1.on_click = preview2.on_click = popup_js
+        preview.on_click = popup_js
 
     def _init_poster_image_widget(self):
         poster_widget = self.fields['poster_image_uploader'].widget
