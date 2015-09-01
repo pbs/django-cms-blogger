@@ -155,7 +155,7 @@ form ul.tagit li.tagit-choice.active-tag {
 })(django.jQuery);
 </script>
 <div class="submit-row form-actions text-right no-margin-bottom no-background">
-<input type="submit" value="{% trans 'Next' %}" name="_continue" {{ onclick_attrib }}/>
+<input type="submit" value="{% trans 'Next' %}" name="_continue" {{ onclick_attrib }} class="btn btn-primary"/>
 </div>
 {% else %}
 {{block.super}}
