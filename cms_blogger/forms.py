@@ -129,6 +129,7 @@ def is_valid_for_layout(page, raise_errors=True):
             "You need to fix this manually." % (page, page_exception))
     return True
 
+
 def validate_for_layout(page_id):
     if not page_id:
         raise ValidationError('Select a page for this layout.')
@@ -200,6 +201,7 @@ def _save_related(form, commit, model_obj, *form_functions):
     original_save_m2m = form.save_m2m
     if hasattr(original_save_m2m, '_save_related_attached'):
         return
+
     def _extra_save_m2m():
         call_post_save()
         original_save_m2m()
@@ -315,7 +317,6 @@ class BlogForm(AbstractBlogForm):
                 "Following categories have invalid length: %s. Category names"
                 " must have between 3 and 30 characters." % invalid_names)
         return categories_names
-
 
     def clean_slug(self):
         slug = slugify(self.cleaned_data.get('slug', '').strip())
@@ -704,12 +705,10 @@ class BlogEntryPageChangeForm(forms.ModelForm):
 
     def _init_preview_buttons(self):
         preview = self.fields['preview_on_top'].widget
-        url = reverse(
+        preview.link_url = reverse(
             'admin:cms_blogger-entry-preview', args=[self.instance.id])
-        preview.link_url = url
-        popup_js = "return showEntryPreviewPopup(this,'%s');" % (
+        preview.on_click = "return showEntryPreviewPopup(this,'%s');" % (
             admin_static_url(), )
-        preview.on_click = popup_js
 
     def _init_poster_image_widget(self):
         poster_widget = self.fields['poster_image_uploader'].widget
@@ -792,7 +791,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         saved_instance = super(BlogEntryPageChangeForm, self).save(
             commit=commit)
         _save_related(self, commit, saved_instance,
-            self._save_categories, self._remove_unused_authors)
+                      self._save_categories, self._remove_unused_authors)
         return saved_instance
 
 
@@ -885,7 +884,7 @@ class MoveEntriesForm(forms.Form):
         self.fields['destination_blog'] = forms.ModelChoiceField(
             Blog.objects.filter(
                 site=Site.objects.get_current()),
-                required=True)
+            required=True)
         self.fields['destination_blog'].initial = destination_blog
 
         self.fields['entries'].queryset = entries
