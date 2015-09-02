@@ -31,7 +31,7 @@ from .models import (
     MAX_CATEGORIES_IN_PLUGIN)
 from .widgets import (
     TagItWidget, ButtonWidget, DateTimeWidget, PosterImage, SpinnerWidget,
-    JQueryUIMultiselect)
+    BootstrapMultiselect)
 from .slug import get_unique_slug
 from .utils import (
     user_display_name, get_allowed_sites, set_cms_site, get_current_site)
@@ -797,22 +797,28 @@ class BlogEntryPageChangeForm(forms.ModelForm):
 
 class BlogRiverForm(forms.ModelForm):
     requires_request = True
+    cancel_filter_btn_html = (
+        '<span class="input-group-btn">'
+        '<button class="btn btn-white multiselect-clear-filter" type="button">'
+        '<i class="fa fa-times-circle red2"></i></button></span>')
     categories = forms.MultipleChoiceField(
-        widget=JQueryUIMultiselect(
+        widget=BootstrapMultiselect(
             attrs={
                 'multiselect': json.dumps({
                     "selectedList": MAX_CATEGORIES_IN_PLUGIN,
                     "header": "Choose categories below",
-                }),
-                'multiselectfilter': json.dumps({
-                    "label": "Search",
-                    "width": "190",
-                    "placeholder": "Enter category name"
+                    "buttonClass": "btn btn-white btn-primary",
+                    "enableFiltering": True,
+                    "templates": {
+                        "filterClearBtn": cancel_filter_btn_html,
+                    }
                 }),
                 "max_items_allowed": MAX_CATEGORIES_IN_PLUGIN,
             }))
+    spinner_opts = ('{min: 3, max: 10,'
+                    'btn_up_class: "btn-info", btn_down_class: "btn-info"}')
     number_of_entries = forms.CharField(
-        widget=SpinnerWidget(attrs={'spinner': '{min: 3, max: 10,}'}))
+        widget=SpinnerWidget(attrs={'spinner': spinner_opts}))
 
     def __init__(self, *args, **kwargs):
         request = kwargs.pop('request', None)
