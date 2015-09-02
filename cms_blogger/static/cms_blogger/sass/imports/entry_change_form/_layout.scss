@@ -3,7 +3,7 @@
 @mixin overides(){
 
         div.main-col{
-            width: 78%;
+            width: 75%;
             float:left;
             border:none;
             padding-right: 15px;
@@ -11,7 +11,7 @@
         
 
             & +  div.right-col{
-                width: 22%;
+                width: 25%;
                 float:right;
 
                 & > .right-col {
@@ -76,8 +76,8 @@
             border: 1px solid #e3e3e3;
             -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
             box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-            margin-left: 25.5%;
-            width: 67%;
+            margin-left: 16.7%;
+            width: 66.3%;
 
             .widget-body {
                 background: transparent;
@@ -104,8 +104,8 @@
             background: white;
         }
         .body-wrapper {
-            margin-left: 25.5%;
-            width: 67%;
+            margin-left: 16.7%;
+            width: 66.3%;
 
             .control-label {
                 display: none;
@@ -125,13 +125,6 @@
             .widget-body {
                 margin-top: 15px;
             }
-            &.collapsed {
-                .header.block {
-                    background-color: #fff !important;
-                    border-color: #ccc !important;
-                    font-size: 15px !important;
-                }
-            }
         }
         .right-col {
             .widget-body {
@@ -143,10 +136,13 @@
                 }
                 .col-sm-9 {
                     width: 100%;
+                    padding-right: 0;
+
                 }
             }
             .description {
                 margin-top: 0px;
+                padding: 0;
             }
             .custom-collapse {
                 .widget-body {
@@ -165,7 +161,7 @@
                 border: 1px solid #d5d5d5;
                 height: 170px;
                 padding: 0;
-                width: 90%;
+                width: 100%;
                 float: left;
                 background: white;
                 padding: 6px 15px 5px;
@@ -180,20 +176,29 @@
                 .control-label {
                     width: 100%;
                     text-align: left;
+                    padding-left: 0;
+                    margin-bottom: 5px;
                 }
                 .col-sm-9  {
                     width: 100%;
+                    padding-right: 0;
                 }
+            }
+            .field-categories .help-button {
+                position: absolute;
+                top: -32px;
+                left: 80px;
             }
             .field-enable_poster_image, .field-disqus_enabled {
                 margin-top: 15px; 
 
                 .control-label, .col-sm-9 {
                     width: 50%;
+                    padding-right: 0;
                     text-align: left;
                 }
                 .control-label {
-                    padding-left: 15px !important;
+                    padding-left: 0;
                 }
             }
         }
