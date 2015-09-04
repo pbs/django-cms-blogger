@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+Revision 43a9a05 (04.09.2015, 09:06 UTC)
+----------------------------------------
+
+* LUN-2569
+
+  * refactor after code review
+  * missplaced elements on Blogs
+
+* LUN-2576
+
+  * next button not styled
+
+* LUN-2588
+
+  * Apply Ace theme to blog river plugin admin
+
+* LUN-2596
+
+  * refactor after fieldset elements have changed their sizes
+
+No other commits.
+
 Revision d72c5a3 (28.08.2015, 08:54 UTC)
 ----------------------------------------
 
