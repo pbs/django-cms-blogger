@@ -62,8 +62,9 @@ def author_row(entry):
     mod_time = as_utc(entry.update_date)
     pub_time = as_utc(entry.publication_date)
     is_updated = mod_time > pub_time
-
+    var_name = ("entry_pub_%s%s" % (time.time(), entry.id)).replace('.' , '')
     return {
+        'date_var': var_name,
         'is_updated': is_updated,
         'utc_millis': as_millis(mod_time if is_updated else pub_time),
         'author_names': entry.authors_display_name,
