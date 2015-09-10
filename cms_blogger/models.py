@@ -194,7 +194,8 @@ class AbstractBlog(models.Model):
 
     branding_image = FilerImageField(
         null=True, blank=True, on_delete=models.SET_NULL,
-        default=None, help_text=_('Blog Branding Image'))
+        default=None, help_text=_('Blog Branding Image'), 
+        verbose_name=_("Branding Image"))
 
     # blog navigation
     in_navigation = models.BooleanField(
