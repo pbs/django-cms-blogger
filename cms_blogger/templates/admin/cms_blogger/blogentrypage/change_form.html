@@ -75,6 +75,8 @@
     $('#publish_form_bottom').replaceWith(
         $('#id_publish').clone(true).prop({'id': 'publish_form_bottom'}));
 
+    $('#publish_form_bottom').prepend('<i class="ace-icon fa fa-calendar"></i>');
+
     $('#save_form_bottom').click(function(event) {
         event.preventDefault();
         $(this).closest('form').append(

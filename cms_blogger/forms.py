@@ -701,7 +701,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         if self.instance.is_published:
             pub_button.text = 'Update'
         else:
-            pub_button.text = 'Save and continue'
+            pub_button.text = 'Save and Continue'
 
     def _init_preview_buttons(self):
         preview = self.fields['preview_on_top'].widget
