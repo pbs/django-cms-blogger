@@ -92,7 +92,7 @@ class ButtonWidget(forms.widgets.CheckboxInput):
         return mark_safe(
             u"%s<a %s href='%s' id='id_%s'>%s</a>%s" % (
                 self.hide_label % name,
-                forms.util.flatatt(self.build_attrs(attrs)),
+                forms.utils.flatatt(self.build_attrs(attrs)),
                 self.link_url, name, text,
                 self.make_js_button % (name, self._render_js_on_click(), )))
 

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_static import static
-from django.contrib.contenttypes.generic import GenericTabularInline
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.core.exceptions import PermissionDenied
 from django.core.files.images import get_image_dimensions
 from django.core.urlresolvers import reverse
@@ -159,12 +159,12 @@ class AbstractBlogAdmin(AdminHelper):
     location_in_navigation.allow_tags = True
     location_in_navigation.short_description = 'Select location'
 
-    def get_formsets(self, request, obj=None):
+    def get_formsets_with_inlines(self, request, obj=None):
         # show layout inline only for valid existing blogs
         if obj and obj.pk and obj.layouts.exists():
             # set request for navigation_preview
             obj._request_for_navigation_preview = request
-            return super(AbstractBlogAdmin, self).get_formsets(request, obj)
+            return super(AbstractBlogAdmin, self).get_formsets_with_inlines(request, obj)
         return []
 
     def navigation_tool(self, request, blog_id):
