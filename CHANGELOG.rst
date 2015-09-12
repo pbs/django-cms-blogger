@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+Revision 8289e4b (12.09.2015, 11:25 UTC)
+----------------------------------------
+
+* LUN-2583
+
+  * remvoved preview
+
+* LUN-2602
+
+  * increase blog image size to 1280 to fit 1280 template, restyle image metadata to match playlist player style
+
+* LUN-2620
+
+  * capitalize the Branding image label
+  * capitalize Save and continue button
+  * toggles with help text fixed
+  * added icon to Publish/Unpublish button
+
+* Misc commits
+
+  * Added missing migration for description updates on models.
+
 Revision 43a9a05 (04.09.2015, 09:06 UTC)
 ----------------------------------------
 
