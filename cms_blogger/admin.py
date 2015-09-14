@@ -411,7 +411,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         }),
 
         (None, {
-            'fields': ['preview_on_top', 'body', 'preview_on_bottom'],
+            'fields': ['preview_on_top', 'body'],
             'classes': ('no-border', 'body-wrapper')
         }),
         (None, {

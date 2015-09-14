@@ -2,7 +2,7 @@
     #{$ns}{
 
         .img-details {
-            background: #333333;
+            background: #F8F8F8;
             border: 0;
             margin-top: 0 !important;
             font-size: 11px;
@@ -10,22 +10,25 @@
             letter-spacing: 1px;
             font-weight: 400;
             display: inline-block;
+            padding: 20px 31px 32px;
+            box-sizing: border-box;
 
             .img-caption {
-                color: #efefef;
-                padding: 15px;
-                padding-bottom: 5px !important;
+                font-size: 13px;
+                text-transform: uppercase;
+                color: #9D9C9C;
+                line-height: 18px;
+                font-weight: bold;
                 display: block;
             }
 
             .img-credit {
-                color: #999999;
-                padding: 15px;
-                display: block;
+                font-size: 21px;
+                color: #4a4a4a;
+                line-height: 28px;
+                font-weight: 400;
             }
-            .img-caption + .img-credit {
-                padding: 0 15px 15px 15px;
-            }
+
         }
 
         .blog-plomotion-plugin,

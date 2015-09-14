@@ -16,6 +16,7 @@ class BlogRiverPlugin(AdminHelper, CMSPluginBase):
     render_template = "cms_blogger/blog_promotion.html"
     form = BlogRiverForm
     change_form_template = "admin/cms_blogger/promotion_plugin_form.html"
+    admin_preview = False
     formfield_overrides = {
         models.BooleanField: {'widget': ToggleWidget}
     }

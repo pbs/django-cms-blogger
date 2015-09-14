@@ -16,7 +16,8 @@ class ToggleWidget(forms.widgets.CheckboxInput):
         is_disabled = (self.attrs.get('disabled', False) or
                        attrs.get('disabled', False))
         active = 'false' if is_disabled else 'true'
-        output = "%s" % (widget_html)
+        output = "<label class='pull-left'>%s<span class='lbl'></span></label>" % (
+            widget_html)
         return mark_safe(output)
 
 
@@ -171,17 +172,15 @@ class PosterImage(forms.widgets.CheckboxInput):
 class SpinnerWidget(forms.widgets.TextInput):
 
     class Media:
-        css = {
-            'all': (
-                static('cms_blogger/css/redmond-jquery-ui.css'),
-            )
-        }
         js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
-              static('cms_blogger/js/jquery-ui.min.js'), )
+              static('cms_blogger/js/ace-extra.min.js'),
+              static('cms_blogger/js/ace-elements.min.js'),
+              static('cms_blogger/js/fuelux.spinner.min.js'),
+              static('cms_blogger/js/ace.min.js'), )
 
     spinner_script = (
         "<script type='text/javascript'>"
-        "jQuery('#id_%s').spinner(%s);"
+        "jQuery('#id_%s').ace_spinner(%s)"
         "</script>")
 
     def __init__(self, attrs=None):
@@ -196,24 +195,22 @@ class SpinnerWidget(forms.widgets.TextInput):
         return mark_safe(output)
 
 
-class JQueryUIMultiselect(forms.widgets.SelectMultiple):
+class BootstrapMultiselect(forms.widgets.SelectMultiple):
 
     class Media:
         css = {
             'all': (
-                static('cms_blogger/css/redmond-jquery-ui.css'),
-                static('cms_blogger/css/jquery.multiselect.css'),
-                static('cms_blogger/css/jquery.multiselect.filter.css'),
+                static('cms_blogger/css/bootstrap-multiselect.min.css'),
             )
         }
         js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
-              static('cms_blogger/js/jquery-ui.min.js'),
-              static('cms_blogger/js/jquery.multiselect.min.js'),
-              static('cms_blogger/js/jquery.multiselect.filter.js'), )
+              static('cms_blogger/js/bootstrap-multiselect.min.js'), )
 
     multiselect_script = (
         "<script type='text/javascript'>"
-        "jQuery('#id_%s').multiselect(%s)%s.next().css('width', 'auto');"
+        "jQuery('#id_%s').multiselect(%s).next().css('width', 'auto')"
+        ".find('.multiselect-search').css('width', 'auto')"
+        ".next().find('.multiselect-clear-filter').css('height', '34px');"
         "</script>")
 
     max_selected_script = (
@@ -230,20 +227,15 @@ class JQueryUIMultiselect(forms.widgets.SelectMultiple):
     def __init__(self, attrs=None):
         attrs = attrs or {}
         self.multiselect_attrs = attrs.pop('multiselect', '{}')
-        self.multiselectfilter = attrs.pop('multiselectfilter', None)
         self.max_selected = attrs.pop('max_items_allowed', None)
-        super(JQueryUIMultiselect, self).__init__(attrs=attrs)
+        super(BootstrapMultiselect, self).__init__(attrs=attrs)
 
     def render(self, name, value, attrs={}):
-        widget_html = super(JQueryUIMultiselect, self).render(
+        widget_html = super(BootstrapMultiselect, self).render(
             name, value, attrs=attrs)
-        multiselectfilter_html = ""
-        if self.multiselectfilter:
-            multiselectfilter_html = ".multiselectfilter(%s)" % (
-                self.multiselectfilter, )
 
         widget_html += self.multiselect_script % (
-            name, self.multiselect_attrs, multiselectfilter_html)
+            name, self.multiselect_attrs)
 
         if self.max_selected:
             widget_html += self.max_selected_script % (
