@@ -96,6 +96,8 @@ class AbstractBlogAdmin(AdminHelper):
     formfield_overrides = {
         models.BooleanField: {'widget': ToggleWidget}
     }
+    raw_id_fields = ('branding_image', )
+
     class Media:
         css = {
             'all': (static('cms_blogger/css/redmond-jquery-ui.css'), )}
