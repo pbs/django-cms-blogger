@@ -9,7 +9,7 @@ class BlogChangeList(ChangeList):
 
     def __init__(self, request, model, *args, **kwargs):
         # set site choices for the site chooser widget
-        self.sites = get_allowed_sites(request, model)
+        self.sites = get_allowed_sites(request, model).order_by('name')
         self.has_access_to_multiple_sites = len(self.sites) > 1
         self.site_lookup = model.site_lookup
         self.current_site = get_current_site(request, model)
