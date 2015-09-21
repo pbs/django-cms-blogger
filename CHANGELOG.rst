@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+Revision ada1646 (21.09.2015, 09:40 UTC)
+----------------------------------------
+
+* LUN-2638
+
+  * entries sorting should remain by pub date
+
+* LUN-2644
+
+  * Firefox bug fixed with wrong size of Default image
+
+* Misc commits
+
+  * Add missing migrations.
+
 Revision 8289e4b (12.09.2015, 11:25 UTC)
 ----------------------------------------
 
