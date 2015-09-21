@@ -376,7 +376,7 @@ class CurrentSiteBlogFilter(admin.filters.RelatedFieldListFilter):
 class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     list_editable = ('is_published', )
     custom_changelist_class = changelists.BlogEntryChangeList
-    list_display = ('__str__', 'slug', 'blog', 'is_published', 'published_at',
+    list_display = ('__str__', 'slug', 'blog', 'is_published', 'updated_at',
                     'entry_authors', 'categories_assigned')
     list_filter = (('blog', CurrentSiteBlogFilter), )
     list_per_page = 50
@@ -686,13 +686,13 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         return entry.authors_display_name
     entry_authors.allow_tags = True
 
-    def published_at(self, entry):
+    def updated_at(self, entry):
         from cms_blogger.templatetags.blogger import publish_date_box
         return (
             '<script type="text/javascript">'
             'document.write(moment(%s).format("DD MMM YYYY hh:mm A"));'
             '</script>' % publish_date_box(entry).get('utc_millis'))
-    published_at.allow_tags = True
+    updated_at.allow_tags = True
 
     def categories_assigned(self, entry):
         category_names = list(entry.categories
