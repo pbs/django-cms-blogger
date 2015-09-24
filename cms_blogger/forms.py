@@ -3,8 +3,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template.defaultfilters import slugify
-from django.forms.util import ErrorList
-from django.contrib.contenttypes.generic import BaseGenericInlineFormSet
+from django.forms.utils import ErrorList
+from django.contrib.contenttypes.forms import BaseGenericInlineFormSet
 from django.contrib.sites.models import Site
 from django.utils.translation import get_language, ugettext_lazy as _
 from django.utils import timezone

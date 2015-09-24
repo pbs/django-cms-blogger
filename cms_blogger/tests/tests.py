@@ -1,7 +1,7 @@
 from django.test import TestCase, TransactionTestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
-from django.contrib.admin.util import flatten_fieldsets
+from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.admin.sites import AdminSite
 from django.core.urlresolvers import reverse
 from django.conf import settings

@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.contrib.contenttypes.generic import GenericRelation
+from django.contrib.contenttypes.fields import GenericRelation
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.db.models import signals
@@ -194,7 +194,7 @@ class AbstractBlog(models.Model):
 
     branding_image = FilerImageField(
         null=True, blank=True, on_delete=models.SET_NULL,
-        default=None, help_text=_('Blog Branding Image'), 
+        default=None, help_text=_('Blog Branding Image'),
         verbose_name=_("Branding Image"))
 
     # blog navigation
@@ -266,7 +266,7 @@ class HomeBlog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = ('-update_date', 'slug')
+        ordering = ('-publication_date', 'slug')
         site_entries = BlogEntryPage.objects.on_site(self.site)
         return site_entries.published().order_by(*ordering)
 
@@ -337,7 +337,7 @@ class Blog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = ('-update_date', 'slug')
+        ordering = ('-publication_date', 'slug')
         return self.blogentrypage_set.published().order_by(*ordering)
 
     @models.permalink
@@ -582,10 +582,10 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         if not self.blog:
             return None
         query_for_prev = Q(
-            Q(Q(update_date=self.update_date) &
+            Q(Q(publication_date=self.publication_date) &
               Q(slug__lt=self.slug)) |
-            Q(update_date__lt=self.update_date))
-        ordering = ('-update_date', '-slug')
+            Q(publication_date__lt=self.publication_date))
+        ordering = ('-publication_date', '-slug')
         siblings = self.blog.get_entries().exclude(id=self.id)
         prev_post = siblings.filter(query_for_prev).order_by(*ordering)[:1]
         return prev_post[0] if prev_post else None
@@ -594,10 +594,10 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         if not self.blog:
             return None
         query_for_next = Q(
-            Q(Q(update_date=self.update_date) &
+            Q(Q(publication_date=self.publication_date) &
               Q(slug__gt=self.slug)) |
-            Q(update_date__gt=self.update_date))
-        ordering = ('update_date', 'slug')
+            Q(publication_date__gt=self.publication_date))
+        ordering = ('publication_date', 'slug')
         siblings = self.blog.get_entries().exclude(id=self.id)
         next_post = siblings.filter(query_for_next).order_by(*ordering)[:1]
         return next_post[0] if next_post else None
@@ -666,7 +666,7 @@ class BlogCategory(models.Model, BlogRelatedPage):
 
     def get_entries(self):
         return self.entries.published().filter(
-            blog=self.blog).order_by('-update_date', 'slug').distinct()
+            blog=self.blog).order_by('-publication_date', 'slug').distinct()
 
     def get_layout(self):
         return self.blog.get_layout_for(Blog.LANDING_PAGE)
@@ -707,7 +707,7 @@ class RiverPlugin(CMSPlugin):
         qs = BlogEntryPage.objects.published().filter(
             categories__name__in=self.categories.split(','),
             blog__site=Site.objects.get_current()
-        ).distinct().order_by('-update_date', 'slug')
+        ).distinct().order_by('-publication_date', 'slug')
         return qs
 
     def __unicode__(self):
