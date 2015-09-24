@@ -133,7 +133,10 @@
             .widget-body {
                 background: transparent;
             }
-            .form-horizontal:first-child {
+            .form-horizontal.hide-label {
+                h4.header {
+                    margin-top: 0;
+                }
                 .control-label {
                     display: none;
                 }
@@ -141,10 +144,13 @@
                     width: 100%;
                     padding-right: 0;
 
+                    input[type="text"] {
+                        width: 100%;
+                    }
                 }
             }
             .description {
-                margin-top: 0px;
+                margin: 0px 0 10px;
                 padding: 0;
             }
             .custom-collapse {
