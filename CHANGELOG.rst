@@ -1,6 +1,31 @@
 CHANGELOG
 =========
 
+Revision bae19d3 (28.09.2015, 11:48 UTC)
+----------------------------------------
+
+* LUN-2591
+
+  * added sites ordering for changelist view
+
+* LUN-2592
+
+  * added chosen widget for site selector
+
+* LUN-2639
+
+  * publish actions visible by default
+
+* LUN-2654
+
+  * fixed admin column header to update at
+
+* Misc commits
+
+  * Django 1.8: removed add/change/delete related buttons from filer widgets
+  * Django 1.8 upgrade: removed some django1.9 deprecation warnings
+  * Django 1.8 upgrade
+
 Revision ada1646 (21.09.2015, 09:40 UTC)
 ----------------------------------------
 
