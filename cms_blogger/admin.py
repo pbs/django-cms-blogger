@@ -142,10 +142,11 @@ class AbstractBlogAdmin(AdminHelper):
                           args=[obj.id])
             output = []
             output.append(
-                u'<a href="%s" class="add-another btn btn-primary btn-xs" id="add_id_navigation_node"'
-                ' onclick="return showNavigationPopup(this);"> ' % url)
-            output.append(
-                u'Open Navigation Tool</a>')
+                u'<a href="%s" class="btn btn-primary btn-xs" '
+                u'id="add_id_navigation_node"'
+                u' onclick="return showNavigationPopup(this);"> '
+                u'<i class="fa fa-search"></i>'
+                u'Open Navigation Tool</a>' % url)
             preview = self._navigation_preview(request, nav_node)
             hide = 'style="display:none"'
             if preview:
@@ -170,8 +171,7 @@ class AbstractBlogAdmin(AdminHelper):
         return []
 
     def navigation_tool(self, request, blog_id):
-        if (request.method not in ['GET', 'POST'] or
-                not "_popup" in request.REQUEST):
+        if ('_popup' not in request.GET and '_popup' not in request.POST):
             raise PermissionDenied
 
         blog = get_object_or_404(self.model, id=blog_id)
@@ -201,7 +201,7 @@ class AbstractBlogAdmin(AdminHelper):
         context = RequestContext(request)
         context.update({
             'title': 'Edit navigation menu',
-            'is_popup': "_popup" in request.REQUEST
+            'is_popup': "_popup" in request.GET or '_popup' in request.POST
         })
         if blog.navigation_node:
             context.update({'initial_blog_node': blog.navigation_node, })
