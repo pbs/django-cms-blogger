@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.template.context import RequestContext
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -7,6 +6,7 @@ from django.db.models import Q
 from menus.base import NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 from .models import BlogNavigationNode
+from .utils import get_from_context
 from collections import OrderedDict
 from itertools import ifilter
 
@@ -38,7 +38,7 @@ class BlogNavigationExtender(Modifier):
         if post_cut:
             return nodes
 
-        proxy_prefix = RequestContext(request).get('PROXY_REWRITE_RULE', '')
+        proxy_prefix = get_from_context(request, 'PROXY_REWRITE_RULE', '')
         node_visible = self._blog_node_visibility(request)
 
         # modification date is required here for the following case:
