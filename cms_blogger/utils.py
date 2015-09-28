@@ -2,6 +2,8 @@ from PIL import Image as PILImage
 from functools import wraps
 import StringIO
 import os
+from django.template.context import RequestContext
+from django.template import Template
 from django.utils.encoding import smart_unicode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
@@ -10,6 +12,15 @@ from django.conf import settings as global_settings
 from filer.utils.loader import load_object
 from .settings import (
     POSTER_IMAGE_WIDTH, POSTER_IMAGE_ASPECT_RATIO, ALLOWED_SITES_FOR_USER)
+
+
+def get_from_context(request, what, default=None):
+    context = RequestContext(request)
+    if hasattr(context, 'bind_template'):
+        # Django 1.8: force context processors
+        with context.bind_template(Template('')):
+            return context.get(what, default)
+    return context.get(what, default)
 
 
 def get_allowed_sites(request, model=None):
