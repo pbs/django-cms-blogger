@@ -726,7 +726,7 @@ def fetch_author_to_update_name_for(instance, **kwargs):
     except Author.DoesNotExist:
         pass
     except Author.MultipleObjectsReturned:
-        authors = Author.objects.filter(user=instance).order_by(slug)
+        authors = Author.objects.filter(user=instance).order_by('slug')
         author = authors[0]
         for to_merge_author in author[1:]:
             author.blog_entries.add(*to_merge_author.entries.all())
