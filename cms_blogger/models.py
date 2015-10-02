@@ -112,6 +112,13 @@ def getCMSContentModel(**kwargs):
     return ModelWithCMSContent
 
 
+
+def _make_get_title_obj_attribute(val):
+    def get_title_obj_attribute(obj, *args, **kwargs):
+        return getattr(obj.get_title_obj(), val, '')
+    return get_title_obj_attribute
+
+
 def contribute_with_title(cls):
     # required in order to make sure page_attribute templatetag will fetch
     #   these attributes from the title object
@@ -122,10 +129,7 @@ def contribute_with_title(cls):
         "menu_title"]
 
     for attr in valid_title_attributes:
-        def get_title_obj_attribute(obj, *args, **kwargs):
-            return getattr(obj.get_title_obj(), attr, '')
-
-        cls.add_to_class('get_%s' % attr, get_title_obj_attribute)
+        cls.add_to_class('get_%s' % attr, _make_get_title_obj_attribute(attr))
     return cls
 
 
