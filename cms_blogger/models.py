@@ -37,10 +37,21 @@ MAX_CATEGORIES_IN_PLUGIN = 20
 
 
 def getCMSContentModel(**kwargs):
+    """
+    Notes:
+    The property names are created because the intent is to give flexibility where this is used.
+    """
+
+    # Attribute name for the content placeholder
     content_attr = kwargs.get('content_attr', 'content')
+    # Name of the property which will contain the value of the unrendered cms content
     body_attr = '%s_body' % content_attr
+    # Name of the function which will retrive the content placeholder
     plugin_getter = 'get_%s_plugin' % content_attr
+    # Default content that will be used for newly created objects
     default_content = 'Sample content'
+    # Name of the private field containing the cached value of the unrendered cms content
+    private_body_attr = '_%s' % body_attr
 
     class ModelWithCMSContent(models.Model):
 
@@ -74,19 +85,19 @@ def getCMSContentModel(**kwargs):
         class Meta:
             abstract = True
 
-        def _get_content_body(self):
-            if hasattr(self, '_content_body'):
-                return self._content_body
-            if not self.pk:
-                return default_content
-            plugin = getattr(self, plugin_getter)()
-            if plugin:
-                self._content_body = plugin.body
-                return self._content_body
+    def _get_content_body(instance):
+        if hasattr(instance, private_body_attr):
+            return getattr(instance, private_body_attr)
+        if not instance.pk:
             return default_content
+        plugin = getattr(instance, plugin_getter)()
+        if plugin:
+            setattr(instance, private_body_attr, plugin.body)
+            return plugin.body
+        return default_content
 
-        def _set_content_body(self, value):
-            self._content_body = value
+    def _set_content_body(instance, value):
+        setattr(instance, private_body_attr, value)
 
     def get_attached_plugin(instance):
         try:
@@ -113,8 +124,7 @@ def getCMSContentModel(**kwargs):
     # set body property
     ModelWithCMSContent.add_to_class(
         body_attr,
-        property(ModelWithCMSContent._get_content_body,
-                 ModelWithCMSContent._set_content_body))
+        property(_get_content_body, _set_content_body))
     ModelWithCMSContent.add_to_class(plugin_getter, get_attached_plugin)
     return ModelWithCMSContent
 
