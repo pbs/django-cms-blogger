@@ -21,7 +21,11 @@
     </div>
     {% if show_year %}
     <div class="year">
-        <script type="text/javascript">document.write({{date_var}}.getYear() < (new Date()).getYear() ? {{date_var}}.getFullYear() : "")</script>
+        <script type="text/javascript">
+	  document.write(
+               {{date_var}}.getYear() < (new Date()).getYear() ? {{date_var}}.getFullYear() : ""
+	   )
+        </script>
     </div>
     {% endif %}
 </div>

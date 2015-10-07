@@ -34,6 +34,7 @@ import uuid
 FILENAME_LENGTH = 100
 CATEGORY_NAME_LENGTH = 30
 MAX_CATEGORIES_IN_PLUGIN = 20
+BLOG_ENTRIES_ORDERING = ('-update_date', 'slug')
 
 
 def getCMSContentModel(**kwargs):
@@ -266,7 +267,7 @@ class HomeBlog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = ('-publication_date', 'slug')
+        ordering = BLOG_ENTRIES_ORDERING
         site_entries = BlogEntryPage.objects.on_site(self.site)
         return site_entries.published().order_by(*ordering)
 
@@ -337,7 +338,7 @@ class Blog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = ('-publication_date', 'slug')
+        ordering = BLOG_ENTRIES_ORDERING
         return self.blogentrypage_set.published().order_by(*ordering)
 
     @models.permalink
@@ -666,7 +667,7 @@ class BlogCategory(models.Model, BlogRelatedPage):
 
     def get_entries(self):
         return self.entries.published().filter(
-            blog=self.blog).order_by('-publication_date', 'slug').distinct()
+            blog=self.blog).order_by(**BLOG_ENTRIES_ORDERING).distinct()
 
     def get_layout(self):
         return self.blog.get_layout_for(Blog.LANDING_PAGE)
@@ -707,7 +708,7 @@ class RiverPlugin(CMSPlugin):
         qs = BlogEntryPage.objects.published().filter(
             categories__name__in=self.categories.split(','),
             blog__site=Site.objects.get_current()
-        ).distinct().order_by('-publication_date', 'slug')
+        ).distinct().order_by(*BLOG_ENTRIES_ORDERING)
         return qs
 
     def __unicode__(self):
