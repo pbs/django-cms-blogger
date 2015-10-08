@@ -1,4 +1,5 @@
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_settings
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.contrib.admin.utils import flatten_fieldsets
@@ -1134,6 +1135,13 @@ class TestAuthorModel(TransactionTestCase):
 
 class TestBlogPageViews(TestCase):
     pass
+
+
+@override_settings(SITE_ID='')
+class TestManagers(TestCase):
+
+    def test_missing_site_handling(self):
+        self.assertEqual(list(BlogEntryPage.objects.on_site()), [])
 
 
 class TestSitemap(TestCase):
