@@ -34,7 +34,8 @@ import uuid
 FILENAME_LENGTH = 100
 CATEGORY_NAME_LENGTH = 30
 MAX_CATEGORIES_IN_PLUGIN = 20
-BLOG_ENTRIES_ORDERING = ('-update_date', 'slug')
+BLOG_ENTRIES_ORDER_BY_UPDATE = ('-update_date', 'slug')
+BLOG_ENTRIES_ORDER_BY_PUBLICATED = ('-publication_date', 'slug')
 
 
 def getCMSContentModel(**kwargs):
@@ -267,9 +268,9 @@ class HomeBlog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = BLOG_ENTRIES_ORDERING
+        ordering = self.entries_ordering.split(',')
         site_entries = BlogEntryPage.objects.on_site(self.site)
-        return site_entries.published().order_by(*ordering)
+        return site_entries.published().order_by(*BLOG_ENTRIES_ORDER_BY_UPDATE)
 
     @models.permalink
     def get_absolute_url(self):
@@ -298,9 +299,18 @@ class Blog(AbstractBlog):
         # BIO_PAGE: 'Blog Bio Page'
     }
 
+    # ENTRIES_ORDERING_CHOICES = {
+    #     '-update_date, slug': 'List blog entries by last updated',
+    #     '-publication_date, slug': 'List blog entries by last published',
+    # }.items()
+
     slug = models.SlugField(
         _("slug"), max_length=50, help_text=_('Blog Slug'))
 
+    # entries_ordering = models.CharField(
+    #     max_length=255, blank=False, null=False,
+    #     choices=ENTRIES_ORDERING_CHOICES, default='-update_date, slug',
+    #     help_text=_('Blog entries ordering'))
     entries_slugs_with_date = models.BooleanField(
         _("Dates in blog entry URLs"), default=False,
         help_text=_('Blog Entries With Slugs'),)
@@ -338,9 +348,9 @@ class Blog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = BLOG_ENTRIES_ORDERING
-        return self.blogentrypage_set.published().order_by(*ordering)
-
+        ordering = self.entries_ordering.split(',')
+        return self.blogentrypage_set.published(
+        ).order_by(*BLOG_ENTRIES_ORDER_BY_UPDATE)
     @models.permalink
     def get_absolute_url(self):
         return ('cms_blogger.views.landing_page', (), {
@@ -586,9 +596,9 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
             Q(Q(publication_date=self.publication_date) &
               Q(slug__lt=self.slug)) |
             Q(publication_date__lt=self.publication_date))
-        ordering = ('-publication_date', '-slug')
         siblings = self.blog.get_entries().exclude(id=self.id)
-        prev_post = siblings.filter(query_for_prev).order_by(*ordering)[:1]
+        prev_post = siblings.filter(query_for_prev
+        ).order_by(*BLOG_ENTRIES_ORDER_BY_PUBLICATED)[:1]
         return prev_post[0] if prev_post else None
 
     def next_post(self):
@@ -598,9 +608,9 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
             Q(Q(publication_date=self.publication_date) &
               Q(slug__gt=self.slug)) |
             Q(publication_date__gt=self.publication_date))
-        ordering = ('publication_date', 'slug')
         siblings = self.blog.get_entries().exclude(id=self.id)
-        next_post = siblings.filter(query_for_next).order_by(*ordering)[:1]
+        next_post = siblings.filter(query_for_next
+        ).order_by(*BLOG_ENTRIES_ORDER_BY_PUBLICATED)[:1]
         return next_post[0] if next_post else None
 
     def delete(self, *args, **kwargs):
@@ -666,8 +676,8 @@ class BlogCategory(models.Model, BlogRelatedPage):
         return title
 
     def get_entries(self):
-        return self.entries.published().filter(
-            blog=self.blog).order_by(**BLOG_ENTRIES_ORDERING).distinct()
+        return self.entries.published().filter(blog=self.blog
+        ).order_by(*BLOG_ENTRIES_ORDER_BY_UPDATE).distinct()
 
     def get_layout(self):
         return self.blog.get_layout_for(Blog.LANDING_PAGE)
@@ -688,6 +698,16 @@ class BlogCategory(models.Model, BlogRelatedPage):
 
 class RiverPlugin(CMSPlugin):
 
+    ENTRIES_ORDERING_CHOICES = (
+        (','.join(BLOG_ENTRIES_ORDER_BY_UPDATE), 'List blog entries by last updated'),
+        (','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED), 'List blog entries by last published'),
+    )
+
+    entries_ordering = models.CharField(
+        max_length=255, blank=False, null=False,
+        choices=ENTRIES_ORDERING_CHOICES, default=','.join(BLOG_ENTRIES_ORDER_BY_UPDATE),
+        help_text=_('Blog entries ordering'))
+
     title = models.CharField(_('title'), max_length=100)
     # allow maximum 20 categories and compute max chars taking commas into
     #   consideration
@@ -705,10 +725,11 @@ class RiverPlugin(CMSPlugin):
         db_table = 'cmsplugin_riverplugin'
 
     def get_entries(self):
+        ordering = self.entries_ordering.split(',')
         qs = BlogEntryPage.objects.published().filter(
             categories__name__in=self.categories.split(','),
             blog__site=Site.objects.get_current()
-        ).distinct().order_by(*BLOG_ENTRIES_ORDERING)
+        ).distinct().order_by(*ordering)
         return qs
 
     def __unicode__(self):

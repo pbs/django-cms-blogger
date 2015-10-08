@@ -28,10 +28,10 @@ from django_select2.fields import (
 
 from .models import (
     Blog, BlogEntryPage, BlogCategory, Author, RiverPlugin, HomeBlog,
-    MAX_CATEGORIES_IN_PLUGIN)
+    MAX_CATEGORIES_IN_PLUGIN, BLOG_ENTRIES_ORDER_BY_UPDATE)
 from .widgets import (
     TagItWidget, ButtonWidget, DateTimeWidget, PosterImage, SpinnerWidget,
-    BootstrapMultiselect)
+    BootstrapMultiselect, BootstrapSelect)
 from .slug import get_unique_slug
 from .utils import (
     user_display_name, get_allowed_sites, set_cms_site, get_current_site)
@@ -801,6 +801,22 @@ class BlogRiverForm(forms.ModelForm):
         '<span class="input-group-btn">'
         '<button class="btn btn-white multiselect-clear-filter" type="button">'
         '<i class="fa fa-times-circle red2"></i></button></span>')
+    entries_ordering = forms.ChoiceField(
+        widget=BootstrapSelect(
+            attrs={
+                'multiselect': json.dumps({
+                    "selectedList": 1,
+                    "header": "Choose categories below",
+                    "buttonClass": "btn btn-white btn-primary",
+                    "enableFiltering": False,
+                    "templates": {
+                        "filterClearBtn": cancel_filter_btn_html,
+                    }
+                }),
+                "max_items_allowed": 1,
+            }),
+        choices=RiverPlugin.ENTRIES_ORDERING_CHOICES,
+    )
     categories = forms.MultipleChoiceField(
         widget=BootstrapMultiselect(
             attrs={
@@ -828,7 +844,7 @@ class BlogRiverForm(forms.ModelForm):
             categories_field.choices = [
                 (name, name)
                 for name in BlogCategory.objects.filter(
-                    blog__site=plugin_page.site
+                        blog__site=plugin_page.site
                 ).order_by('name').values_list('name', flat=True).distinct()]
 
         super(BlogRiverForm, self).__init__(*args, **kwargs)

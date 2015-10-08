@@ -241,3 +241,36 @@ class BootstrapMultiselect(forms.widgets.SelectMultiple):
             widget_html += self.max_selected_script % (
                 name, self.max_selected, self.max_selected)
         return mark_safe(widget_html)
+
+
+class BootstrapSelect(forms.widgets.Select):
+
+    class Media:
+        css = {
+            'all': (
+                static('cms_blogger/css/bootstrap-multiselect.min.css'),
+            )
+        }
+        js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
+              static('cms_blogger/js/bootstrap-multiselect.min.js'), )
+
+    multiselect_script = ("""<script type='text/javascript'>
+jQuery('#id_%s').multiselect(%s).next().css('width', 'auto')
+    .find('.multiselect-search').css('width', 'auto').next()
+    .find('.multiselect-clear-filter').css('height', '34px'); </script>""")
+
+    def __init__(self, attrs=None):
+        attrs = attrs or {}
+        self.multiselect_attrs = attrs.pop('multiselect', '{}')
+        self.max_selected = attrs.pop('max_items_allowed', None)
+        super(BootstrapSelect, self).__init__(attrs=attrs)
+
+    def render(self, name, value, attrs={}):
+        widget_html = super(BootstrapSelect, self).render(
+            name, value, attrs=attrs
+        )
+
+        widget_html += self.multiselect_script % (
+            name, self.multiselect_attrs)
+
+        return mark_safe(widget_html)
