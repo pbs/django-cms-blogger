@@ -20,7 +20,7 @@ Date.prototype.getShortDate = Date.prototype.getShortDate || function () {
 
       date_string = date_format.supplant({
 	     month: month[0] + month.slice(1).toLowerCase(),
-	     day: this.getDay(),
+	     day: this.get2DigitDayString(),
 	     hours: hours24 % 12 || 12,
 	     minutes: minutes < 10 ? '0' + minutes : minutes,
              meridian: hours24 >= 12 ? 'pm' : 'am'
