@@ -22,7 +22,6 @@ class BlogRiverPlugin(AdminHelper, CMSPluginBase):
     }
 
     def render(self, context, instance, placeholder):
-        # import pdb; pdb.set_trace()
         request = context['request']
         entries = paginate_queryset(
             instance.get_entries(), request.GET.get('blog_promo_page'),

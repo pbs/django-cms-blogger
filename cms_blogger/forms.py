@@ -28,7 +28,9 @@ from django_select2.fields import (
 
 from .models import (
     Blog, BlogEntryPage, BlogCategory, Author, RiverPlugin, HomeBlog,
-    MAX_CATEGORIES_IN_PLUGIN, BLOG_ENTRIES_ORDER_BY_UPDATE)
+    MAX_CATEGORIES_IN_PLUGIN,
+    ENTRIES_ORDERING_CHOICES,
+    BLOG_ENTRIES_ORDER_BY_UPDATE)
 from .widgets import (
     TagItWidget, ButtonWidget, DateTimeWidget, PosterImage, SpinnerWidget,
     BootstrapMultiselect, BootstrapSelect)
@@ -815,7 +817,7 @@ class BlogRiverForm(forms.ModelForm):
                 }),
                 "max_items_allowed": 1,
             }),
-        choices=RiverPlugin.ENTRIES_ORDERING_CHOICES,
+        choices=ENTRIES_ORDERING_CHOICES,
     )
     categories = forms.MultipleChoiceField(
         widget=BootstrapMultiselect(

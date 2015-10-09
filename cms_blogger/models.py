@@ -36,6 +36,11 @@ CATEGORY_NAME_LENGTH = 30
 MAX_CATEGORIES_IN_PLUGIN = 20
 BLOG_ENTRIES_ORDER_BY_UPDATE = ('-update_date', 'slug')
 BLOG_ENTRIES_ORDER_BY_PUBLICATED = ('-publication_date', 'slug')
+ENTRIES_ORDERING_CHOICES = (
+    (','.join(BLOG_ENTRIES_ORDER_BY_UPDATE), 'List blog entries by last updated'),
+    (','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED), 'List blog entries by last published'),
+)
+
 
 
 def getCMSContentModel(**kwargs):
@@ -178,6 +183,11 @@ class BlogNavigationNode(models.Model):
 
 @contribute_with_title
 class AbstractBlog(models.Model):
+    entries_ordering = models.CharField(
+        max_length=255, blank=False, null=False,
+        choices=ENTRIES_ORDERING_CHOICES, default=BLOG_ENTRIES_ORDER_BY_UPDATE,
+        help_text=_('Blog entries ordering'))
+
     site_lookup = 'site__exact'
     is_home = False
 
@@ -299,18 +309,8 @@ class Blog(AbstractBlog):
         # BIO_PAGE: 'Blog Bio Page'
     }
 
-    # ENTRIES_ORDERING_CHOICES = {
-    #     '-update_date, slug': 'List blog entries by last updated',
-    #     '-publication_date, slug': 'List blog entries by last published',
-    # }.items()
-
     slug = models.SlugField(
         _("slug"), max_length=50, help_text=_('Blog Slug'))
-
-    # entries_ordering = models.CharField(
-    #     max_length=255, blank=False, null=False,
-    #     choices=ENTRIES_ORDERING_CHOICES, default='-update_date, slug',
-    #     help_text=_('Blog entries ordering'))
     entries_slugs_with_date = models.BooleanField(
         _("Dates in blog entry URLs"), default=False,
         help_text=_('Blog Entries With Slugs'),)
@@ -697,12 +697,6 @@ class BlogCategory(models.Model, BlogRelatedPage):
 
 
 class RiverPlugin(CMSPlugin):
-
-    ENTRIES_ORDERING_CHOICES = (
-        (','.join(BLOG_ENTRIES_ORDER_BY_UPDATE), 'List blog entries by last updated'),
-        (','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED), 'List blog entries by last published'),
-    )
-
     entries_ordering = models.CharField(
         max_length=255, blank=False, null=False,
         choices=ENTRIES_ORDERING_CHOICES, default=','.join(BLOG_ENTRIES_ORDER_BY_UPDATE),
