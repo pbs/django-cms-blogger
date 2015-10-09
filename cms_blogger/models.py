@@ -185,7 +185,8 @@ class BlogNavigationNode(models.Model):
 class AbstractBlog(models.Model):
     entries_ordering = models.CharField(
         max_length=255, blank=False, null=False,
-        choices=ENTRIES_ORDERING_CHOICES, default=BLOG_ENTRIES_ORDER_BY_UPDATE,
+        choices=ENTRIES_ORDERING_CHOICES,
+        default=','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
         help_text=_('Blog entries ordering'))
 
     site_lookup = 'site__exact'
@@ -280,7 +281,7 @@ class HomeBlog(AbstractBlog):
     def get_entries(self):
         ordering = self.entries_ordering.split(',')
         site_entries = BlogEntryPage.objects.on_site(self.site)
-        return site_entries.published().order_by(*BLOG_ENTRIES_ORDER_BY_UPDATE)
+        return site_entries.published().order_by(*ordering)
 
     @models.permalink
     def get_absolute_url(self):
@@ -350,7 +351,7 @@ class Blog(AbstractBlog):
     def get_entries(self):
         ordering = self.entries_ordering.split(',')
         return self.blogentrypage_set.published(
-        ).order_by(*BLOG_ENTRIES_ORDER_BY_UPDATE)
+        ).order_by(*ordering)
     @models.permalink
     def get_absolute_url(self):
         return ('cms_blogger.views.landing_page', (), {
@@ -598,7 +599,7 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
             Q(publication_date__lt=self.publication_date))
         siblings = self.blog.get_entries().exclude(id=self.id)
         prev_post = siblings.filter(query_for_prev
-        ).order_by(*BLOG_ENTRIES_ORDER_BY_PUBLICATED)[:1]
+        ).order_by(*self.blog.entries_ordering.split(','))[:1]
         return prev_post[0] if prev_post else None
 
     def next_post(self):
@@ -610,7 +611,7 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
             Q(publication_date__gt=self.publication_date))
         siblings = self.blog.get_entries().exclude(id=self.id)
         next_post = siblings.filter(query_for_next
-        ).order_by(*BLOG_ENTRIES_ORDER_BY_PUBLICATED)[:1]
+        ).order_by(*self.blog.entries_ordering.split(','))[:1]
         return next_post[0] if next_post else None
 
     def delete(self, *args, **kwargs):
@@ -699,7 +700,8 @@ class BlogCategory(models.Model, BlogRelatedPage):
 class RiverPlugin(CMSPlugin):
     entries_ordering = models.CharField(
         max_length=255, blank=False, null=False,
-        choices=ENTRIES_ORDERING_CHOICES, default=','.join(BLOG_ENTRIES_ORDER_BY_UPDATE),
+        choices=ENTRIES_ORDERING_CHOICES,
+        default=','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
         help_text=_('Blog entries ordering'))
 
     title = models.CharField(_('title'), max_length=100)

@@ -472,7 +472,11 @@ class TestBlogModel(TestCase):
         self.assertEquals(self.client.get(landing_url).status_code, 200)
 
     def _make_blog(self):
-        form_data = {'title': 'one title', 'slug': 'one-title'}
+        form_data = {
+            'title':  'one title',
+            'slug': 'one-title',
+            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
+        }
         blog = Blog.objects.create(**form_data)
         blog.allowed_users.add(self.user)
         page_for_layouts = create_page(
@@ -778,7 +782,10 @@ class TestBlogEntryModel(TestCase):
             'admin', 'admin@cms_blogger.com', 'secret')
         self.client.login(username='admin', password='secret')
         self.blog = Blog.objects.create(**{
-            'title': 'one title', 'slug': 'one-title'})
+            'title': 'one title',
+            'slug': 'one-title',
+            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
+        })
 
     def tearDown(self):
         self.client.logout()
@@ -824,7 +831,10 @@ class TestBlogEntryModel(TestCase):
                 'title': '%s' % i, 'blog': self.blog,
                 'short_description': 'desc', 'is_published': True})
         BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {e.title: e for e in BlogEntryPage.objects.all()}
+        entries = {
+            e.title: e
+            for e in BlogEntryPage.objects.all()
+        }
 
         self.assertEquals(entries["0"].previous_post(), None)
         self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)

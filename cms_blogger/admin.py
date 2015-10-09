@@ -336,7 +336,7 @@ class HomeBlogAdmin(AbstractBlogAdmin):
         (None, {'fields': ['site', 'title', ], 'classes': ('general', )}), )
     change_form_fieldsets = (
         (None, {
-            'fields': ('site', 'title', 'tagline', 'branding_image'),
+            'fields': ('site', 'title', 'tagline', 'branding_image', 'entries_ordering',),
             'classes': ('extrapretty',),
             'description': _('Home Blog Setup Description')
         }),
