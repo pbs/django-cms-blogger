@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+Revision 12da780 (13.10.2015, 13:16 UTC)
+----------------------------------------
+
+* LUN-2571
+
+  * Fixed display for special characters.
+
+* LUN-2664
+
+  * Updated Credit and Caption text in blog metadata
+
+* LUN-2675
+
+  * fixed popup for nav tool
+
+* LUN-2676
+
+  * fixed proxy prefix for blogs * django 1.8 - request context needs to have a bounded template in order for context processors to be called
+
+* Misc commits
+
+  * Add missing migration 0003.
+
 Revision bae19d3 (28.09.2015, 11:48 UTC)
 ----------------------------------------
 
