@@ -593,12 +593,23 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
     def previous_post(self):
         if not self.blog:
             return None
-        query_for_prev = Q(
-            Q(Q(publication_date=self.publication_date) &
-              Q(slug__lt=self.slug)) |
-            Q(publication_date__lt=self.publication_date))
+        by_update = ','.join(BLOG_ENTRIES_ORDER_BY_UPDATE)
+        by_publicated = ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED)
+        ordering = {
+            by_update: Q(
+                Q(Q(update_date=self.update_date) &
+                  Q(slug__lt=self.slug)) |
+                Q(update_date__lt=self.update_date)
+            ),
+            by_publicated: Q(
+                Q(Q(publication_date=self.publication_date) &
+                  Q(slug__lt=self.slug)) |
+                Q(publication_date__lt=self.publication_date)
+            ),
+        }
+        prev_query = ordering[self.blog.entries_ordering]
         siblings = self.blog.get_entries().exclude(id=self.id)
-        prev_post = siblings.filter(query_for_prev
+        prev_post = siblings.filter(prev_query
         ).order_by(*self.blog.entries_ordering.split(','))[:1]
         return prev_post[0] if prev_post else None
 

@@ -784,7 +784,7 @@ class TestBlogEntryModel(TestCase):
         self.blog = Blog.objects.create(**{
             'title': 'one title',
             'slug': 'one-title',
-            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
+            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_UPDATE),
         })
 
     def tearDown(self):
@@ -832,8 +832,8 @@ class TestBlogEntryModel(TestCase):
                 'short_description': 'desc', 'is_published': True})
         BlogEntryPage.objects.update(publication_date=timezone.now())
         entries = {
-            e.title: e
-            for e in BlogEntryPage.objects.all()
+            entry.title: entry
+            for entry in BlogEntryPage.objects.order_by()
         }
 
         self.assertEquals(entries["0"].previous_post(), None)
