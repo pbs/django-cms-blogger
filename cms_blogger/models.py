@@ -591,38 +591,44 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
             self, layout, request, context=context).make_response()
 
     def previous_post(self):
+        """
+        Returns the next blog entry based on entries ordering. When the
+        entry dates(i.e. publication or updated) date is the same, it
+        compares the slugs.
+        """
         if not self.blog:
             return None
-        by_update = ','.join(BLOG_ENTRIES_ORDER_BY_UPDATE)
-        by_publicated = ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED)
-        ordering = {
-            by_update: Q(
-                Q(Q(update_date=self.update_date) &
-                  Q(slug__lt=self.slug)) |
-                Q(update_date__lt=self.update_date)
-            ),
-            by_publicated: Q(
-                Q(Q(publication_date=self.publication_date) &
-                  Q(slug__lt=self.slug)) |
-                Q(publication_date__lt=self.publication_date)
-            ),
+        order_table = {
+            '-publication_date,slug': Q(
+                Q(publication_date=self.publication_date, slug__lt=self.slug) |
+                Q(publication_date__lt=self.publication_date)),
+            '-update_date,slug': Q(
+                Q(update_date=self.update_date, slug__lt=self.slug) |
+                Q(update_date__lt=self.update_date)),
         }
-        prev_query = ordering[self.blog.entries_ordering]
         siblings = self.blog.get_entries().exclude(id=self.id)
-        prev_post = siblings.filter(prev_query
-        ).order_by(*self.blog.entries_ordering.split(','))[:1]
+        order_by = ['-' + o.strip('-')
+                    for o in self.blog.entries_ordering.split(',')]
+        prev_entries = order_table[self.blog.entries_ordering]
+        prev_post = siblings.filter(prev_entries).order_by(*order_by)[:1]
         return prev_post[0] if prev_post else None
 
     def next_post(self):
         if not self.blog:
             return None
-        query_for_next = Q(
-            Q(Q(publication_date=self.publication_date) &
-              Q(slug__gt=self.slug)) |
-            Q(publication_date__gt=self.publication_date))
+        order_table = {
+            '-publication_date,slug': Q(
+                Q(publication_date=self.publication_date, slug__gt=self.slug) |
+                Q(publication_date__gt=self.publication_date)),
+            '-update_date,slug':Q(
+                Q(update_date=self.update_date,slug__gt=self.slug) |
+                Q(update_date__gt=self.update_date)),
+        }
         siblings = self.blog.get_entries().exclude(id=self.id)
-        next_post = siblings.filter(query_for_next
-        ).order_by(*self.blog.entries_ordering.split(','))[:1]
+        order_by = [o.strip('-')
+                    for o in self.blog.entries_ordering.split(',')]
+        next_entries = order_table[self.blog.entries_ordering]
+        next_post = siblings.filter(next_entries).order_by(*order_by)[:1]
         return next_post[0] if next_post else None
 
     def delete(self, *args, **kwargs):

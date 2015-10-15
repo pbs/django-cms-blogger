@@ -26,6 +26,7 @@ import xml.etree.ElementTree
 import urlparse
 import urllib
 
+import pytest
 
 class TestMoveAction(TestCase):
     def super_user(self):
@@ -775,6 +776,9 @@ class TestChangeLists(TestCase):
         self.client.logout()
 
 
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("blog_entries")
 class TestBlogEntryModel(TestCase):
 
     def setUp(self):
@@ -784,7 +788,7 @@ class TestBlogEntryModel(TestCase):
         self.blog = Blog.objects.create(**{
             'title': 'one title',
             'slug': 'one-title',
-            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_UPDATE),
+            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
         })
 
     def tearDown(self):
@@ -809,43 +813,39 @@ class TestBlogEntryModel(TestCase):
         self.assertTrue(Blog.objects.filter(pk=self.blog.pk).exists())
 
     def test_next_prev_post_even(self):
-        for i in range(4):
-            BlogEntryPage.objects.create(**{
-                'title': '%s' % i, 'blog': self.blog,
-                'short_description': 'desc', 'is_published': True})
-        BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {e.title: e for e in BlogEntryPage.objects.all()}
-
-        self.assertEquals(entries["0"].previous_post(), None)
-        self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)
-        self.assertEquals(entries["1"].previous_post().pk, entries["0"].pk)
-        self.assertEquals(entries["1"].next_post().pk, entries["2"].pk)
-        self.assertEquals(entries["2"].previous_post().pk, entries["1"].pk)
-        self.assertEquals(entries["2"].next_post().pk, entries["3"].pk)
-        self.assertEquals(entries["3"].previous_post().pk, entries["2"].pk)
-        self.assertEquals(entries["3"].next_post(), None)
+        count = 4
+        entries = self.make_blog_entries(
+            publication_date=timezone.now(),
+            blog=self.blog,
+            how_many=count,
+        )
+        actual = {i: dict(prev=entries[i].previous_post(),
+                          next=entries[i].next_post()) for i in range(4)}
+        expected = {
+            0: dict(prev=None, next=entries[1]),
+            1: dict(prev=entries[0], next=entries[2]),
+            2: dict(prev=entries[1], next=entries[3]),
+            3: dict(prev=entries[2], next=None),
+        }
+        assert actual == expected
 
     def test_next_prev_post_odd(self):
-        for i in range(5):
-            BlogEntryPage.objects.create(**{
-                'title': '%s' % i, 'blog': self.blog,
-                'short_description': 'desc', 'is_published': True})
-        BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {
-            entry.title: entry
-            for entry in BlogEntryPage.objects.order_by()
+        count = 5
+        entries = self.make_blog_entries(
+            publication_date=timezone.now(),
+            blog=self.blog,
+            how_many=count,
+        )
+        actual = {i: dict(prev=entries[i].previous_post(),
+                          next=entries[i].next_post()) for i in range(count)}
+        expected = {
+            0: dict(prev=None, next=entries[1]),
+            1: dict(prev=entries[0], next=entries[2]),
+            2: dict(prev=entries[1], next=entries[3]),
+            3: dict(prev=entries[2], next=entries[4]),
+            4: dict(prev=entries[3], next=None),
         }
-
-        self.assertEquals(entries["0"].previous_post(), None)
-        self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)
-        self.assertEquals(entries["1"].previous_post().pk, entries["0"].pk)
-        self.assertEquals(entries["1"].next_post().pk, entries["2"].pk)
-        self.assertEquals(entries["2"].previous_post().pk, entries["1"].pk)
-        self.assertEquals(entries["2"].next_post().pk, entries["3"].pk)
-        self.assertEquals(entries["3"].previous_post().pk, entries["2"].pk)
-        self.assertEquals(entries["3"].next_post().pk, entries["4"].pk)
-        self.assertEquals(entries["4"].previous_post().pk, entries["3"].pk)
-        self.assertEquals(entries["4"].next_post(), None)
+        assert actual == expected
 
     def test_draft(self):
         draft_entry = BlogEntryPage.objects.create(blog=self.blog)
