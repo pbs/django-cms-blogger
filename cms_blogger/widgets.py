@@ -16,8 +16,8 @@ class ToggleWidget(forms.widgets.CheckboxInput):
         is_disabled = (self.attrs.get('disabled', False) or
                        attrs.get('disabled', False))
         active = 'false' if is_disabled else 'true'
-        output = "<label class='pull-left'>%s<span class='lbl'></span></label>" % (
-            widget_html)
+        output = ("<label class='pull-left'>"
+                  "%s<span class='lbl'></span></label>" % widget_html)
         return mark_safe(output)
 
 
@@ -67,8 +67,8 @@ class ButtonWidget(forms.widgets.CheckboxInput):
 
     make_js_button = (
         "<script type='text/javascript'>"
-        "jQuery('#id_%s').addClass('default btn btn-primary').click(function(event) {"
-        "event.preventDefault();%s});"
+        "jQuery('#id_%s').addClass('default btn btn-primary').click("
+        "function(event) {event.preventDefault();%s});"
         "</script>")
     submit_on_click_js = (
         "jQuery(this).closest('form').append("

@@ -503,8 +503,8 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         _('end publication'),
         db_index=True, blank=True, null=True,
         help_text=_('End date of publication.'))
-    is_published = models.BooleanField(_('is published'),
-        blank=True, default=False,)
+    is_published = models.BooleanField(
+        _('is published'), blank=True, default=False)
 
     seo_title = models.CharField(
         _('SEO Title'), blank=True, max_length=120)
@@ -628,7 +628,7 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
                 Q(publication_date=self.publication_date, slug__gt=self.slug) |
                 Q(publication_date__gt=self.publication_date)),
             OrderEntriesMixin.ORDER_BY_UPDATE: Q(
-                Q(update_date=self.update_date,slug__gt=self.slug) |
+                Q(update_date=self.update_date, slug__gt=self.slug) |
                 Q(update_date__gt=self.update_date)),
         }
         siblings = self.blog.get_entries().exclude(id=self.id)
@@ -702,8 +702,8 @@ class BlogCategory(models.Model, BlogRelatedPage):
 
     def get_entries(self):
         ordering = OrderEntriesMixin.ORDER_BY_UPDATE.split(',')
-        return self.entries.published().filter(blog=self.blog
-        ).order_by(*ordering).distinct()
+        return self.entries.published().filter(
+            blog=self.blog).order_by(*ordering).distinct()
 
     def get_layout(self):
         return self.blog.get_layout_for(Blog.LANDING_PAGE)

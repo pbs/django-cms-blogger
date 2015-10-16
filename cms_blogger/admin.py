@@ -104,7 +104,7 @@ class AbstractBlogAdmin(AdminHelper):
         js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
               static("cms_blogger/js/jquery-ui.min.js"), )
 
-    #### NAVIGATION ####
+    # NAVIGATION
     def _get_nodes(self, request, nodes, node_id, output):
         for node in nodes:
             if node.id == node_id:
@@ -167,7 +167,8 @@ class AbstractBlogAdmin(AdminHelper):
         if obj and obj.pk and obj.layouts.exists():
             # set request for navigation_preview
             obj._request_for_navigation_preview = request
-            return super(AbstractBlogAdmin, self).get_formsets_with_inlines(request, obj)
+            return super(AbstractBlogAdmin,
+                         self).get_formsets_with_inlines(request, obj)
         return []
 
     def navigation_tool(self, request, blog_id):
@@ -225,7 +226,7 @@ class AbstractBlogAdmin(AdminHelper):
         return blog_obj.title
     displayed_title.short_description = 'Title'
 
-    ### PERMISSIONS ###
+    # PERMISSIONS
     def get_current_site(self, request):
         return get_current_site(request, self.model)
 
@@ -329,14 +330,15 @@ class HomeBlogAdmin(AbstractBlogAdmin):
                    show_next=True),
         WizardForm(form=forms.HomeBlogForm,
                    fieldsets='change_form_fieldsets',
-                   readonly= ['site', 'location_in_navigation'],
+                   readonly=['site', 'location_in_navigation'],
                    when=lambda obj: bool(obj))
     )
     add_form_fieldsets = (
         (None, {'fields': ['site', 'title', ], 'classes': ('general', )}), )
     change_form_fieldsets = (
         (None, {
-            'fields': ('site', 'title', 'tagline', 'branding_image', 'entries_ordering',),
+            'fields': ('site', 'title', 'tagline',
+                       'branding_image', 'entries_ordering',),
             'classes': ('extrapretty',),
             'description': _('Home Blog Setup Description')
         }),
@@ -346,7 +348,7 @@ class HomeBlogAdmin(AbstractBlogAdmin):
         }),
     )
 
-    ### PERMISSIONS ###
+    # PERMISSIONS
     def get_queryset(self, request):
         qs = super(HomeBlogAdmin, self).get_queryset(request)
         if request.user.is_superuser:
@@ -500,7 +502,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         url_patterns.extend(urls)
         return url_patterns
 
-    ### CUSTOM VIEWS ###
+    # CUSTOM VIEWS
     def preview(self, request, entry_id):
         entry = get_object_or_404(self.model, id=entry_id)
         if 'body' in request.POST:
@@ -634,7 +636,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         messages.success(request, message)
         return redirect(reverse('admin:cms_blogger_blogentrypage_changelist'))
 
-    ### PLACEHOLDER ADMIN VIEWS ###
+    # PLACEHOLDER ADMIN VIEWS
     def add_plugin(self, request):
         """
         Adds a plugin the the hidded placeholder of the blog entry.
@@ -656,7 +658,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         setattr(request, 'current_page', entry.get_layout().from_page)
         return super(BlogEntryPageAdmin, self).edit_plugin(request, plugin_id)
 
-    ### BULK ACTIONS ###
+    # BULK ACTIONS
     def make_published(self, request, queryset):
         # cannot publish draft entries
         draft_entries = Q(Q(title__isnull=True) | Q(title__exact='') |
@@ -681,7 +683,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         return redirect(url)
     move_entries.short_description = "Move entries to another blog"
 
-    ### CUSTOM ADMIN COLUMNS ###
+    # CUSTOM ADMIN COLUMNS
     def entry_authors(self, entry):
         return entry.authors_display_name
     entry_authors.allow_tags = True
@@ -695,14 +697,14 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     updated_at.allow_tags = True
 
     def categories_assigned(self, entry):
-        category_names = list(entry.categories
-            .values_list('name', flat=True).order_by('name'))
+        category_names = list(entry.categories.values_list(
+            'name', flat=True).order_by('name'))
         text = ', '.join(category_names)
         max_len = 70
         return text if len(text) <= max_len else (text[:max_len-3] + '...')
     categories_assigned.short_description = 'Categories'
 
-    ### PERMISSIONS ###
+    # PERMISSIONS
     def _is_allowed(self, request):
         if request.user.is_superuser:
             return True
@@ -768,8 +770,8 @@ def _move_entries(destination_blog, entries_ids, mirror_categories=True):
     for blogentry in BlogEntryPage.objects.filter(id__in=entries_ids):
         previous_categories = list(blogentry.categories.values_list(
             'name', flat=True))
-        #performance improvement by assigning m2m queryset instead of clearing
-        # and reassigning
+        # performance improvement by assigning m2m queryset instead of clearing
+        #  and reassigning
         blogentry.categories.clear()
         destination_categories = BlogCategory.objects.filter(
             blog=destination_blog, name__in=previous_categories)
