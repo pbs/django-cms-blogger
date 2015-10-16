@@ -476,7 +476,7 @@ class TestBlogModel(TestCase):
         form_data = {
             'title':  'one title',
             'slug': 'one-title',
-            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
+            'entries_ordering': OrderEntriesMixin.ORDER_BY_PUBLICATION,
         }
         blog = Blog.objects.create(**form_data)
         blog.allowed_users.add(self.user)
@@ -788,7 +788,7 @@ class TestBlogEntryModel(TestCase):
         self.blog = Blog.objects.create(**{
             'title': 'one title',
             'slug': 'one-title',
-            'entries_ordering': ','.join(BLOG_ENTRIES_ORDER_BY_PUBLICATED),
+            'entries_ordering': OrderEntriesMixin.ORDER_BY_UPDATE,
         })
 
     def tearDown(self):
