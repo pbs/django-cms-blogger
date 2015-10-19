@@ -191,6 +191,58 @@ class OrderEntriesMixin(object):
         return ordered_entries
 
 
+class OrderEntriesSequenceMixin(object):
+    def order_table(self, order):
+        return {
+            'next': {
+                OrderEntriesMixin.ORDER_BY_PUBLICATION: Q(
+                    Q(publication_date=self.publication_date, slug__gt=self.slug) |
+                    Q(publication_date__gt=self.publication_date)),
+                OrderEntriesMixin.ORDER_BY_UPDATE: Q(
+                    Q(update_date=self.update_date, slug__gt=self.slug) |
+                    Q(update_date__gt=self.update_date)),
+            },
+            'previous': {
+                OrderEntriesMixin.ORDER_BY_PUBLICATION: Q(
+                    Q(publication_date=self.publication_date, slug__lt=self.slug) |
+                    Q(publication_date__lt=self.publication_date)),
+                OrderEntriesMixin.ORDER_BY_UPDATE: Q(
+                    Q(update_date=self.update_date, slug__lt=self.slug) |
+                    Q(update_date__lt=self.update_date)),
+            }
+       }[order]
+
+    def previous_post(self):
+        """
+        Returns the previous blog entry based on entries ordering. When the
+        entry dates(i.e. publication or updated) date is the same, it
+        compares the slugs.
+        """
+        if not self.blog:
+            return None
+        siblings = self.blog.get_entries().exclude(id=self.id)
+        order_by = ['-' + o.strip('-')
+                    for o in self.blog.entries_ordering.split(',')]
+        prev_entries = self.order_table('previous')[self.blog.entries_ordering]
+        prev_post = siblings.filter(prev_entries).order_by(*order_by)[:1]
+        return prev_post[0] if prev_post else None
+
+    def next_post(self):
+        """
+        Returns the next blog entry based on entries ordering. When the
+        entry dates(i.e. publication or updated) date is the same, it
+        compares the slugs.
+        """
+        if not self.blog:
+            return None
+        siblings = self.blog.get_entries().exclude(id=self.id)
+        order_by = [o.strip('-')
+                    for o in self.blog.entries_ordering.split(',')]
+        next_entries = self.order_table('next')[self.blog.entries_ordering]
+        next_post = siblings.filter(next_entries).order_by(*order_by)[:1]
+        return next_post[0] if next_post else None
+
+
 @contribute_with_title
 class AbstractBlog(OrderEntriesMixin, models.Model):
     site_lookup = 'site__exact'
@@ -467,7 +519,8 @@ def get_poster_image_storage():
 
 
 @blog_page
-class BlogEntryPage(getCMSContentModel(content_attr='content'),
+class BlogEntryPage(OrderEntriesSequenceMixin,
+                    getCMSContentModel(content_attr='content'),
                     BlogRelatedPage):
     uses_layout_type = Blog.ENTRY_PAGE
     title = models.CharField(_('title'), max_length=255)
@@ -596,47 +649,6 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         context.update({'entry': self, 'blog': self.blog, })
         return LayoutResponse(
             self, layout, request, context=context).make_response()
-
-    def previous_post(self):
-        """
-        Returns the next blog entry based on entries ordering. When the
-        entry dates(i.e. publication or updated) date is the same, it
-        compares the slugs.
-        """
-        if not self.blog:
-            return None
-        order_table = {
-            OrderEntriesMixin.ORDER_BY_PUBLICATION: Q(
-                Q(publication_date=self.publication_date, slug__lt=self.slug) |
-                Q(publication_date__lt=self.publication_date)),
-            OrderEntriesMixin.ORDER_BY_UPDATE: Q(
-                Q(update_date=self.update_date, slug__lt=self.slug) |
-                Q(update_date__lt=self.update_date)),
-        }
-        siblings = self.blog.get_entries().exclude(id=self.id)
-        order_by = ['-' + o.strip('-')
-                    for o in self.blog.entries_ordering.split(',')]
-        prev_entries = order_table[self.blog.entries_ordering]
-        prev_post = siblings.filter(prev_entries).order_by(*order_by)[:1]
-        return prev_post[0] if prev_post else None
-
-    def next_post(self):
-        if not self.blog:
-            return None
-        order_table = {
-            OrderEntriesMixin.ORDER_BY_PUBLICATION: Q(
-                Q(publication_date=self.publication_date, slug__gt=self.slug) |
-                Q(publication_date__gt=self.publication_date)),
-            OrderEntriesMixin.ORDER_BY_UPDATE: Q(
-                Q(update_date=self.update_date, slug__gt=self.slug) |
-                Q(update_date__gt=self.update_date)),
-        }
-        siblings = self.blog.get_entries().exclude(id=self.id)
-        order_by = [o.strip('-')
-                    for o in self.blog.entries_ordering.split(',')]
-        next_entries = order_table[self.blog.entries_ordering]
-        next_post = siblings.filter(next_entries).order_by(*order_by)[:1]
-        return next_post[0] if next_post else None
 
     def delete(self, *args, **kwargs):
         path = self.poster_image.name
