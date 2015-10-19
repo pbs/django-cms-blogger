@@ -872,7 +872,7 @@
 }
 
 /* line 4, ../sass/imports/blogger/_image.scss */
-.cms-blogger .img-details {
+.cms-blogger .entry-image-container .img-details {
   background: #F8F8F8;
   border: 0;
   margin-top: 0 !important;
@@ -885,7 +885,7 @@
   box-sizing: border-box;
 }
 /* line 16, ../sass/imports/blogger/_image.scss */
-.cms-blogger .img-details .img-caption {
+.cms-blogger .entry-image-container .img-details .img-caption {
   font-size: 11px;
   text-transform: uppercase;
   color: #9D9C9C;
@@ -894,7 +894,7 @@
   display: block;
 }
 /* line 25, ../sass/imports/blogger/_image.scss */
-.cms-blogger .img-details .img-credit {
+.cms-blogger .entry-image-container .img-details .img-credit {
   font-size: 14px;
   color: #4a4a4a;
   line-height: 18px;
