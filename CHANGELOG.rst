@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+Revision 43b33c4 (20.10.2015, 13:23 UTC)
+----------------------------------------
+
+* LUN-2702
+
+  * Handle new exception thrown by django.contrib.sites.models.SiteManager
+
+* LUN-2724
+
+  * keep the look and feel of image plugins even on blog posts
+
+No other commits.
+
 Revision 12da780 (13.10.2015, 13:16 UTC)
 ----------------------------------------
 
