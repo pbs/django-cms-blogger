@@ -185,7 +185,7 @@ class OrderEntriesMixin(object):
     )
 
     def get_entries(self):
-        entries = super(EntriesOrderMixin, self).get_entries()
+        entries = BlogEntryPage.objects.all()
         order_by = self.entries_ordering.split(',')
         ordered_entries = entries.order_by(*order_by)
         return ordered_entries
@@ -210,7 +210,7 @@ class OrderEntriesSequenceMixin(object):
                     Q(update_date=self.update_date, slug__lt=self.slug) |
                     Q(update_date__lt=self.update_date)),
             }
-       }[order]
+        }[order]
 
     def previous_post(self):
         """
@@ -302,7 +302,7 @@ class AbstractBlog(OrderEntriesMixin, models.Model):
         return get_template("cms_blogger/blog_content.html").render(context)
 
     def get_entries(self):
-        return BlogEntryPage.objects.none()
+        return super(AbstractBlog, self).get_entries()
 
     @property
     def attached_image(self):
@@ -340,7 +340,8 @@ class HomeBlog(AbstractBlog):
             return None
 
     def get_entries(self):
-        site_entries = BlogEntryPage.objects.on_site(self.site)
+        entries = super(HomeBlog, self).get_entries()
+        site_entries = entries.on_site(self.site)
         return site_entries.published()
 
     @models.permalink
@@ -409,7 +410,9 @@ class Blog(AbstractBlog):
             return None
 
     def get_entries(self):
-        return self.blogentrypage_set.published()
+        entries = super(Blog, self).get_entries()
+        blog_entries = entries.filter(blog=self).published()
+        return blog_entries
 
     @models.permalink
     def get_absolute_url(self):
@@ -758,7 +761,8 @@ class RiverPlugin(OrderEntriesMixin, CMSPlugin):
         db_table = 'cmsplugin_riverplugin'
 
     def get_entries(self):
-        qs = BlogEntryPage.objects.published().filter(
+        entries = super(RiverPlugin, self).get_entries()
+        qs = entries.published().filter(
             categories__name__in=self.categories.split(','),
             blog__site=Site.objects.get_current()
         ).distinct()

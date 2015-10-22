@@ -284,7 +284,7 @@ class BlogAdmin(AbstractBlogAdmin):
     change_form_fieldsets = (
         ('Blog setup', {
             'fields': ['site', 'title', 'slug', 'tagline', 'branding_image',
-                       'categories'],
+                       'categories', 'entries_ordering'],
             'classes': ('extrapretty', ),
             'description': _('Blog Setup Description')
         }),
