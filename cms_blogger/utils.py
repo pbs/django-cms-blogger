@@ -1,7 +1,9 @@
-from PIL import Image as PILImage
-from functools import wraps
-import StringIO
+import functools
+import io
 import os
+
+import PIL.Image
+
 from django.template.context import RequestContext
 from django.template import Template
 from django.utils.encoding import smart_unicode
@@ -10,8 +12,7 @@ from django.core.files.base import ContentFile
 from django.contrib.sites.models import Site
 from django.conf import settings as global_settings
 from filer.utils.loader import load_object
-from .settings import (
-    POSTER_IMAGE_WIDTH, POSTER_IMAGE_ASPECT_RATIO, ALLOWED_SITES_FOR_USER)
+from . import settings
 
 
 def get_from_context(request, what, default=None):
@@ -24,8 +25,8 @@ def get_from_context(request, what, default=None):
 
 
 def get_allowed_sites(request, model=None):
-    if ALLOWED_SITES_FOR_USER and request and model:
-        get_sites_for = load_object(ALLOWED_SITES_FOR_USER)
+    if settings.ALLOWED_SITES_FOR_USER and request and model:
+        get_sites_for = load_object(settings.ALLOWED_SITES_FOR_USER)
         return get_sites_for(request.user, model)
 
     if global_settings.CMS_PERMISSION and request:
@@ -36,7 +37,7 @@ def get_allowed_sites(request, model=None):
 
 
 def set_cms_site(f):
-    @wraps(f)
+    @functools.wraps(f)
     def wrapper(request, *args, **kwds):
         current_site = f(request, *args, **kwds)
         if hasattr(request, 'session'):
@@ -88,57 +89,47 @@ def paginate_queryset(queryset, page, max_per_page):
     return paginated_items
 
 
-POSTER_IMAGE_HEIGHT = int(round(
-    POSTER_IMAGE_WIDTH / POSTER_IMAGE_ASPECT_RATIO))
+class NamedBytesIO(io.BytesIO):
+    def __init__(self, *args, **kwargs):
+        self.name = kwargs.pop('name')
+        super(NamedBytesIO, self).__init__(*args, **kwargs)
 
 
-def resize_image(file_like_object):
+
+def image_to_file(image, filename):
+    named_content = NamedBytesIO(name=filename)
+    image.save(named_content)
+    out_file = ContentFile(content=named_content.getvalue(),
+                           name=filename)
+    return out_file
+
+
+def resize_image(image_file, specs=settings, resizer=PIL.Image):
     """
     Resizes an image file based on the width and aspect ratio settings;
     Returns a django like image that can be passed to a
         django file/image field.
     """
-
-    def _to_django_file(pil_image, filename):
-        # convert PIL Image to a django content file
-        thumb_io = StringIO.StringIO()
-        setattr(thumb_io, 'name', filename)
-        pil_image.save(thumb_io)
-        dj_file = ContentFile(thumb_io.getvalue(), name=filename)
-        if not file_like_object.closed:
-            file_like_object.close()
-        return dj_file
-
-    full_file_name = file_like_object.name
-    filename, _ = os.path.splitext(os.path.basename(full_file_name))
-    file_like_object.seek(0)
+    filename, _ = os.path.splitext(os.path.basename(image_file.name))
+    image_file.seek(0)
     try:
-        pil_img = PILImage.open(file_like_object)
-    except Exception as e:
-        raise Exception('Cannot open image %s. Error occured: %s' % (
-            full_file_name, e))
-
-    pil_img.load()  # make sure PIL has read the data
-
-    # prepare sizes
-    img_width, img_height = pil_img.size
-    fixed_width, fixed_height = POSTER_IMAGE_WIDTH, POSTER_IMAGE_HEIGHT
-    fixed_size = (fixed_width, fixed_height)
-
-    # make it smaller if too large, preserving its aspect ratio
-    if (img_width > fixed_width or img_height > fixed_height):
-        pil_img.thumbnail(fixed_size, PILImage.ANTIALIAS)
-
-    # add transparent background
-    color = (255, 255, 255, 0)
-    background_img = PILImage.new('RGBA', fixed_size, color)
-    # refetch size since it could be different than the original
-    img_width, img_height = pil_img.size
-
-    # paste image in the center of the transparent image
-    start_at_x = (fixed_width - img_width) / 2
-    start_at_y = (fixed_height - img_height) / 2
-    background_img.paste(pil_img, (start_at_x, start_at_y))
-
-    return _to_django_file(
-        background_img, ''.join((filename, os.path.extsep, 'png')))
+        image = resizer.open(image_file)
+    except IOError as e:
+        message_format = 'Cannot open image {image}. Error occured: {error}'
+        message = message_format.format(image=image_file.name, error=e)
+        raise IOError(message)
+    image.load()
+    original_width, original_height = image.size
+    poster_width = min(max(specs.POSTER_MIN_IMAGE_WIDTH, original_width),
+                       specs.POSTER_IMAGE_WIDTH)
+    poster_height = int(round(poster_width / specs.POSTER_IMAGE_ASPECT_RATIO))
+    poster_size = poster_width, poster_height
+    image.thumbnail(poster_size, resizer.ANTIALIAS)
+    thumbnail_width, thumbnail_height = image.size
+    poster_image = resizer.new('RGBA', poster_size, 'white')
+    center_point = ((poster_width - thumbnail_width) / 2,
+                    (poster_height - thumbnail_height) / 2)
+    poster_image.paste(image, center_point)
+    filepath = ''.join((filename, os.path.extsep, 'png'))
+    django_image_file = image_to_file(poster_image, filepath)
+    return django_image_file

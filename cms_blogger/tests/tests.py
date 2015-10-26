@@ -5,6 +5,7 @@ from django.contrib.sites.models import Site
 from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.admin.sites import AdminSite
 from django.core.urlresolvers import reverse
+from django.core.files import uploadedfile
 from django.conf import settings
 from django.template import Template
 from django.utils import timezone
@@ -13,7 +14,7 @@ from django.db import IntegrityError
 from dateutil import tz, parser
 
 from cms_blogger.models import *
-from cms_blogger import admin, forms
+from cms_blogger import admin, forms, utils
 from cms.api import create_page, add_plugin
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from menus.menu_pool import menu_pool
@@ -26,6 +27,8 @@ from cms_layouts.slot_finder import get_fixed_section_slots
 import xml.etree.ElementTree
 import urlparse
 import urllib
+
+import PIL.Image
 
 
 class TestMoveAction(TestCase):
@@ -1322,3 +1325,41 @@ class TestSitemap(TestCase):
         self.assertEqual(len(locations), len(lastmods))
         for lastmod in lastmods:
             self.assertIsNot(lastmod, None)
+
+
+class ResizeSpecs(object):
+    POSTER_IMAGE_ASPECT_RATIO = 16.0 / 9.0
+    POSTER_MIN_IMAGE_WIDTH = 640
+    POSTER_MIN_IMAGE_HEIGHT = 360
+    POSTER_IMAGE_WIDTH = 1280
+    POSTER_IMAGE_HEIGHT = 720
+
+    @classmethod
+    def too_large(cls):
+        return (cls.POSTER_IMAGE_WIDTH * 2, cls.POSTER_IMAGE_HEIGHT)
+
+    @classmethod
+    def too_small(cls):
+        return (cls.POSTER_MIN_IMAGE_WIDTH / 2, cls.POSTER_IMAGE_HEIGHT)
+
+    @classmethod
+    def just_right(cls):
+        return ((cls.POSTER_IMAGE_WIDTH + cls.POSTER_MIN_IMAGE_WIDTH) / 2,
+                (cls.POSTER_IMAGE_HEIGHT + cls.POSTER_MIN_IMAGE_HEIGHT) / 2)
+
+
+def test_resize_large():
+    filename = 'input_image.jpg'
+    large_image = utils.image_to_file(
+        image=PIL.Image.new('RGB', ResizeSpecs.too_large()),
+        filename=filename,
+    )
+    output_file = utils.resize_image(large_image, ResizeSpecs)
+    pil_image = PIL.Image(output_file)
+    pil_image.load()
+    width, height = pil_image.size
+    assert (ResizeSpecs.POSTER_MIN_IMAGE_WIDTH <= width and
+            ResizeSpecs.POSTER_IMAGE_WIDTH >= width)
+    assert (ResizeSpecs.POSTER_MIN_IMAGE_HEIGHT <= height and
+            ResizeSpecs.POSTER_IMAGE_HEIGHT >= height)
+
