@@ -101,16 +101,17 @@ def image_to_file(image, filename):
     image.save(named_content)
     out_file = ContentFile(content=named_content.getvalue(),
                            name=filename)
+    out_file.close()
     return out_file
 
 
 def resize_image(image_file, specs=settings, resizer=PIL.Image):
     """
-    Resizes an image file based on the width and aspect ratio settings;
-    Returns a django like image that can be passed to a
-        django file/image field.
+    Resizes an image file based on the width and aspect ratio
+    settings;
+    Returns a django like image that can be passed to a django
+    file/image field.
     """
-    filename, _ = os.path.splitext(os.path.basename(image_file.name))
     image_file.seek(0)
     try:
         image = resizer.open(image_file)
@@ -130,6 +131,7 @@ def resize_image(image_file, specs=settings, resizer=PIL.Image):
     center_point = ((poster_width - thumbnail_width) / 2,
                     (poster_height - thumbnail_height) / 2)
     poster_image.paste(image, center_point)
+    filename, _ = os.path.splitext(os.path.basename(image_file.name))
     filepath = ''.join((filename, os.path.extsep, 'png'))
     django_image_file = image_to_file(poster_image, filepath)
     return django_image_file
