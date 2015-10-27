@@ -5,7 +5,7 @@ import re
 _connection_words = [
     "a", "an", "as", "at", "before", "but", "by", "for", "from",
     "is", "in", "into", "like", "of", "off", "on", "onto", "per",
-    "since", "than", "the", "this", "that", "to", "up", "via", "with"];
+    "since", "than", "the", "this", "that", "to", "up", "via", "with"]
 
 CONNECTION_WORDS_PATTERN = '\\b(' + '|'.join(_connection_words) + ')\\b'
 

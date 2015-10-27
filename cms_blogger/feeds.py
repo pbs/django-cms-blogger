@@ -68,4 +68,3 @@ class BlogFeed(Feed):
     item_enclosure_mime_type = 'image/png'
     # for performance reasons
     item_enclosure_length = 0
-
