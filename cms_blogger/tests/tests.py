@@ -1350,16 +1350,13 @@ class ResizeSpecs(object):
 
 def test_resize_large():
     filename = 'input_image.jpg'
-    large_image = utils.image_to_file(
-        image=PIL.Image.new('RGB', ResizeSpecs.too_large()),
-        filename=filename,
-    )
-    output_file = utils.resize_image(large_image, ResizeSpecs)
-    pil_image = PIL.Image(output_file)
+    input_image = PIL.Image.new('RGBA', ResizeSpecs.too_large(), 'red')
+    image_file = utils.image_to_file(image=input_image, filename=filename)
+    utils.resize_image(image_file, ResizeSpecs)
+    pil_image = PIL.Image.open(output_file)
     pil_image.load()
     width, height = pil_image.size
     assert (ResizeSpecs.POSTER_MIN_IMAGE_WIDTH <= width and
             ResizeSpecs.POSTER_IMAGE_WIDTH >= width)
     assert (ResizeSpecs.POSTER_MIN_IMAGE_HEIGHT <= height and
             ResizeSpecs.POSTER_IMAGE_HEIGHT >= height)
-
