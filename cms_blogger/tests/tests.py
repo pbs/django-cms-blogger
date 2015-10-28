@@ -28,6 +28,7 @@ import xml.etree.ElementTree
 import urlparse
 import urllib
 
+import pytest
 import PIL.Image
 
 
@@ -1348,9 +1349,13 @@ class ResizeSpecs(object):
                 (cls.POSTER_IMAGE_HEIGHT + cls.POSTER_MIN_IMAGE_HEIGHT) / 2)
 
 
-def test_resize_large():
+
+@pytest.mark.parametrize("specs", (ResizeSpecs.too_small(),
+                                   ResizeSpecs.just_right(),
+                                   ResizeSpecs.too_large()))
+def test_resize(specs):
     filename = 'input_image.jpg'
-    input_image = PIL.Image.new('RGBA', ResizeSpecs.too_large(), 'red')
+    input_image = PIL.Image.new('RGBA', specs, 'red')
     contentfile = utils.image_to_contentfile(image=input_image,
                                              filename=filename)
     resized_contentfile = utils.resize_image(contentfile, ResizeSpecs)
@@ -1360,3 +1365,5 @@ def test_resize_large():
             width <= ResizeSpecs.POSTER_IMAGE_WIDTH)
     assert (ResizeSpecs.POSTER_MIN_IMAGE_HEIGHT <= height and
             height <= ResizeSpecs.POSTER_IMAGE_HEIGHT)
+
+
