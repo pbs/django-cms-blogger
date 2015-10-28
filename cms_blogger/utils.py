@@ -90,13 +90,21 @@ def paginate_queryset(queryset, page, max_per_page):
 
 
 class NamedBytesIO(io.BytesIO):
+    """
+    A simple named bytestream.
+    """
     def __init__(self, *args, **kwargs):
         self.name = kwargs.pop('name')
         super(NamedBytesIO, self).__init__(*args, **kwargs)
 
 
+def image_to_contentfile(image, filename):
+    """
+    Returns a named bytestream of the input image
 
-def image_to_file(image, filename):
+    :param image: the image to be stored
+    :param filename: the name of the outputfile
+    """
     named_content = NamedBytesIO(name=filename)
     image.save(named_content)
     out_file = ContentFile(content=named_content.getvalue(),
@@ -105,12 +113,31 @@ def image_to_file(image, filename):
     return out_file
 
 
+def calculate_resized_poster_size(size, specs):
+    """
+    Returns a size tuple with the proper width and height within specs
+    bounds
+
+    :param size: the width, height size tuple
+    :param specs: the namespace that contains POSTER_* attributes
+    """
+    width, height = size
+    poster_width = min(max(specs.POSTER_MIN_IMAGE_WIDTH, width),
+                       specs.POSTER_IMAGE_WIDTH)
+    poster_height = int(round(poster_width / specs.POSTER_IMAGE_ASPECT_RATIO))
+    return poster_width, poster_height
+
+
 def resize_image(image_file, specs=settings, resizer=PIL.Image):
     """
     Resizes an image file based on the width and aspect ratio
     settings;
     Returns a django like image that can be passed to a django
     file/image field.
+
+    :param image_file: the file object that support reading
+    :param specs: the namespace object with size specifications attributes
+    :param resizer: the resizer implementation object
     """
     image_file.seek(0)
     try:
@@ -120,11 +147,8 @@ def resize_image(image_file, specs=settings, resizer=PIL.Image):
         message = message_format.format(image=image_file.name, error=e)
         raise IOError(message)
     image.load()
-    original_width, original_height = image.size
-    poster_width = min(max(specs.POSTER_MIN_IMAGE_WIDTH, original_width),
-                       specs.POSTER_IMAGE_WIDTH)
-    poster_height = int(round(poster_width / specs.POSTER_IMAGE_ASPECT_RATIO))
-    poster_size = poster_width, poster_height
+    poster_size = calculate_resized_poster_size(image.size, specs)
+    poster_width, poster_height = poster_size
     image.thumbnail(poster_size, resizer.ANTIALIAS)
     thumbnail_width, thumbnail_height = image.size
     poster_image = resizer.new('RGBA', poster_size, 'white')
@@ -133,5 +157,5 @@ def resize_image(image_file, specs=settings, resizer=PIL.Image):
     poster_image.paste(image, center_point)
     filename, _ = os.path.splitext(os.path.basename(image_file.name))
     filepath = ''.join((filename, os.path.extsep, 'png'))
-    django_image_file = image_to_file(poster_image, filepath)
+    django_image_file = image_to_contentfile(poster_image, filepath)
     return django_image_file

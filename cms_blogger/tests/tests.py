@@ -1346,7 +1346,7 @@ class ResizeSpecs(object):
 
     @classmethod
     def too_large(cls):
-        return (cls.POSTER_IMAGE_WIDTH * 2, cls.POSTER_IMAGE_HEIGHT)
+        return (cls.POSTER_IMAGE_WIDTH * 2, cls.POSTER_IMAGE_HEIGHT * 2)
 
     @classmethod
     def too_small(cls):
@@ -1361,12 +1361,12 @@ class ResizeSpecs(object):
 def test_resize_large():
     filename = 'input_image.jpg'
     input_image = PIL.Image.new('RGBA', ResizeSpecs.too_large(), 'red')
-    image_file = utils.image_to_file(image=input_image, filename=filename)
-    utils.resize_image(image_file, ResizeSpecs)
-    pil_image = PIL.Image.open(output_file)
-    pil_image.load()
-    width, height = pil_image.size
+    contentfile = utils.image_to_contentfile(image=input_image,
+                                             filename=filename)
+    resized_contentfile = utils.resize_image(contentfile, ResizeSpecs)
+    resized_image = PIL.Image.open(resized_contentfile)
+    width, height = resized_image.size
     assert (ResizeSpecs.POSTER_MIN_IMAGE_WIDTH <= width and
-            ResizeSpecs.POSTER_IMAGE_WIDTH >= width)
+            width <= ResizeSpecs.POSTER_IMAGE_WIDTH)
     assert (ResizeSpecs.POSTER_MIN_IMAGE_HEIGHT <= height and
-            ResizeSpecs.POSTER_IMAGE_HEIGHT >= height)
+            height <= ResizeSpecs.POSTER_IMAGE_HEIGHT)
