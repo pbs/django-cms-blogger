@@ -1,6 +1,36 @@
 CHANGELOG
 =========
 
+Revision 368d0c0 (28.10.2015, 12:05 UTC)
+----------------------------------------
+
+* LUN-2678
+
+  * error borders fixed on ckeditor
+
+* LUN-2684
+
+  * Moved set/get outside mixin and changed private name to prevent name clashes.
+  * Load cms content only when required.
+
+* LUN-2693
+
+  * Call abstract get_entries.
+  * Extract another mixin.
+  * PEP8 changes.
+  * Relegete behaviour to mixin.
+  * Fix tests.
+  * More tests.
+  * Work on tests.
+  * Change date
+  * Fix bad day string.
+  * Add bootstrapselect widget.
+  * Sort by updated date.
+
+* Misc commits
+
+  * Fix errors.
+
 Revision 43b33c4 (20.10.2015, 13:23 UTC)
 ----------------------------------------
 
