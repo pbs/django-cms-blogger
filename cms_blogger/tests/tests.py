@@ -5,7 +5,6 @@ from django.contrib.sites.models import Site
 from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.admin.sites import AdminSite
 from django.core.urlresolvers import reverse
-from django.core.files import uploadedfile
 from django.conf import settings
 from django.template import Template
 from django.utils import timezone
