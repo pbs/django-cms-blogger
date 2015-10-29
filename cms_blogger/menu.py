@@ -97,7 +97,7 @@ class BlogNavigationExtender(Modifier):
             nodes_with_position = {
                 node: position for position, node in enumerate(nodes)}
 
-            visible_roots =  dict(enumerate((
+            visible_roots = dict(enumerate((
                 node for node in nodes if node.visible and not node.parent)))
             last_node = visible_roots.get(len(visible_roots) - 1)
 

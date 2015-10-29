@@ -14,12 +14,12 @@ DEPENDENCIES = [
 ]
 
 DEPENDENCY_LINKS = [
-    'http://github.com/pbs/django-cms-layouts/tarball/master#egg=django-cms-layouts-0.1'
+    'https://github.com/pbs/django-cms-layouts/tarball/master#egg=django-cms-layouts-0.1'
 ]
 
 setup(
     name='django-cms-blogger',
-    version='0.7.0.pbs.9',
+    version='0.7.0.pbs.11',
     description='Django CMS blogging tool that lets users create blogs '
                 'using layouts created from CMS pages.',
     long_description=open(README, 'r').read(),

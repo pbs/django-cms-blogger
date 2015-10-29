@@ -1,6 +1,72 @@
 CHANGELOG
 =========
 
+Revision 368d0c0 (28.10.2015, 12:05 UTC)
+----------------------------------------
+
+* LUN-2678
+
+  * error borders fixed on ckeditor
+
+* LUN-2684
+
+  * Moved set/get outside mixin and changed private name to prevent name clashes.
+  * Load cms content only when required.
+
+* LUN-2693
+
+  * Call abstract get_entries.
+  * Extract another mixin.
+  * PEP8 changes.
+  * Relegete behaviour to mixin.
+  * Fix tests.
+  * More tests.
+  * Work on tests.
+  * Change date
+  * Fix bad day string.
+  * Add bootstrapselect widget.
+  * Sort by updated date.
+
+* Misc commits
+
+  * Fix errors.
+
+Revision 43b33c4 (20.10.2015, 13:23 UTC)
+----------------------------------------
+
+* LUN-2702
+
+  * Handle new exception thrown by django.contrib.sites.models.SiteManager
+
+* LUN-2724
+
+  * keep the look and feel of image plugins even on blog posts
+
+No other commits.
+
+Revision 12da780 (13.10.2015, 13:16 UTC)
+----------------------------------------
+
+* LUN-2571
+
+  * Fixed display for special characters.
+
+* LUN-2664
+
+  * Updated Credit and Caption text in blog metadata
+
+* LUN-2675
+
+  * fixed popup for nav tool
+
+* LUN-2676
+
+  * fixed proxy prefix for blogs * django 1.8 - request context needs to have a bounded template in order for context processors to be called
+
+* Misc commits
+
+  * Add missing migration 0003.
+
 Revision bae19d3 (28.09.2015, 11:48 UTC)
 ----------------------------------------
 

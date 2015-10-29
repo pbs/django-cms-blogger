@@ -1,4 +1,5 @@
 from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -10,7 +11,7 @@ class EntriesQuerysetMixin(object):
         if not site:
             try:
                 site = Site.objects.get_current()
-            except Site.DoesNotExist:
+            except (Site.DoesNotExist, ImproperlyConfigured):
                 site = None
         return self.filter(blog__site=site)
 

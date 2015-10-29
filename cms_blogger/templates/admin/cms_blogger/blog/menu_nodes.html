@@ -1,7 +1,7 @@
 {% load menu_tags %}
 {% for child in children %}
 {
-    label: '{{ child.get_menu_title }}',
+    label: '{{ child.get_menu_title|escapejs }}',
     id: {{child.id}},
     blogNode: {% if child.attr.blogNode %}true{% else %}false{% endif %} ,
     children: [{% if child.children %}

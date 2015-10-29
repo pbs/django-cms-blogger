@@ -12,10 +12,11 @@ class WizardForm(_wizard_opts):
     def __new__(cls, form=None, fieldsets=None,
                 readonly=None, prepopulated=None, when=None, show_next=False):
         if when is None:
-            when = lambda x: False
-        return super(WizardForm, cls).__new__(cls,
-            form or ModelForm, fieldsets or (), readonly or (),
-            prepopulated or {}, when, show_next)
+            def when(x):
+                return False
+        args = (form or ModelForm, fieldsets or (), readonly or (),
+                prepopulated or {}, when, show_next)
+        return super(WizardForm, cls).__new__(cls, *args)
 
 
 class AdminHelper(admin.ModelAdmin):
@@ -34,9 +35,12 @@ class AdminHelper(admin.ModelAdmin):
         admin = self.__class__
 
         for _form in self.wizard_forms:
-            get_val = lambda field_name: getattr(_form, field_name)
-            as_property = lambda field: (field,
-                                         lazy_attr(admin, get_val(field)))
+            def get_val(field_name):
+                return getattr(_form, field_name)
+
+            def as_property(field):
+                return (field, lazy_attr(admin, get_val(field)))
+
             self._wizard_forms.append(
                 WizardForm(**dict(map(as_property, _form._fields))))
         if self._wizard_forms:

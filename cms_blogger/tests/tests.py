@@ -1,4 +1,5 @@
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_settings
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
 from django.contrib.admin.utils import flatten_fieldsets
@@ -26,6 +27,7 @@ import xml.etree.ElementTree
 import urlparse
 import urllib
 
+import pytest
 
 class TestMoveAction(TestCase):
     def super_user(self):
@@ -472,7 +474,11 @@ class TestBlogModel(TestCase):
         self.assertEquals(self.client.get(landing_url).status_code, 200)
 
     def _make_blog(self):
-        form_data = {'title': 'one title', 'slug': 'one-title'}
+        form_data = {
+            'title':  'one title',
+            'slug': 'one-title',
+            'entries_ordering': OrderEntriesMixin.ORDER_BY_PUBLICATION,
+        }
         blog = Blog.objects.create(**form_data)
         blog.allowed_users.add(self.user)
         page_for_layouts = create_page(
@@ -771,6 +777,9 @@ class TestChangeLists(TestCase):
         self.client.logout()
 
 
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("blog_entries")
 class TestBlogEntryModel(TestCase):
 
     def setUp(self):
@@ -778,7 +787,10 @@ class TestBlogEntryModel(TestCase):
             'admin', 'admin@cms_blogger.com', 'secret')
         self.client.login(username='admin', password='secret')
         self.blog = Blog.objects.create(**{
-            'title': 'one title', 'slug': 'one-title'})
+            'title': 'one title',
+            'slug': 'one-title',
+            'entries_ordering': OrderEntriesMixin.ORDER_BY_UPDATE,
+        })
 
     def tearDown(self):
         self.client.logout()
@@ -802,40 +814,39 @@ class TestBlogEntryModel(TestCase):
         self.assertTrue(Blog.objects.filter(pk=self.blog.pk).exists())
 
     def test_next_prev_post_even(self):
-        for i in range(4):
-            BlogEntryPage.objects.create(**{
-                'title': '%s' % i, 'blog': self.blog,
-                'short_description': 'desc', 'is_published': True})
-        BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {e.title: e for e in BlogEntryPage.objects.all()}
-
-        self.assertEquals(entries["0"].previous_post(), None)
-        self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)
-        self.assertEquals(entries["1"].previous_post().pk, entries["0"].pk)
-        self.assertEquals(entries["1"].next_post().pk, entries["2"].pk)
-        self.assertEquals(entries["2"].previous_post().pk, entries["1"].pk)
-        self.assertEquals(entries["2"].next_post().pk, entries["3"].pk)
-        self.assertEquals(entries["3"].previous_post().pk, entries["2"].pk)
-        self.assertEquals(entries["3"].next_post(), None)
+        count = 4
+        entries = self.make_blog_entries(
+            publication_date=timezone.now(),
+            blog=self.blog,
+            how_many=count,
+        )
+        actual = {i: dict(prev=entries[i].previous_post(),
+                          next=entries[i].next_post()) for i in range(4)}
+        expected = {
+            0: dict(prev=None, next=entries[1]),
+            1: dict(prev=entries[0], next=entries[2]),
+            2: dict(prev=entries[1], next=entries[3]),
+            3: dict(prev=entries[2], next=None),
+        }
+        assert actual == expected
 
     def test_next_prev_post_odd(self):
-        for i in range(5):
-            BlogEntryPage.objects.create(**{
-                'title': '%s' % i, 'blog': self.blog,
-                'short_description': 'desc', 'is_published': True})
-        BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {e.title: e for e in BlogEntryPage.objects.all()}
-
-        self.assertEquals(entries["0"].previous_post(), None)
-        self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)
-        self.assertEquals(entries["1"].previous_post().pk, entries["0"].pk)
-        self.assertEquals(entries["1"].next_post().pk, entries["2"].pk)
-        self.assertEquals(entries["2"].previous_post().pk, entries["1"].pk)
-        self.assertEquals(entries["2"].next_post().pk, entries["3"].pk)
-        self.assertEquals(entries["3"].previous_post().pk, entries["2"].pk)
-        self.assertEquals(entries["3"].next_post().pk, entries["4"].pk)
-        self.assertEquals(entries["4"].previous_post().pk, entries["3"].pk)
-        self.assertEquals(entries["4"].next_post(), None)
+        count = 5
+        entries = self.make_blog_entries(
+            publication_date=timezone.now(),
+            blog=self.blog,
+            how_many=count,
+        )
+        actual = {i: dict(prev=entries[i].previous_post(),
+                          next=entries[i].next_post()) for i in range(count)}
+        expected = {
+            0: dict(prev=None, next=entries[1]),
+            1: dict(prev=entries[0], next=entries[2]),
+            2: dict(prev=entries[1], next=entries[3]),
+            3: dict(prev=entries[2], next=entries[4]),
+            4: dict(prev=entries[3], next=None),
+        }
+        assert actual == expected
 
     def test_draft(self):
         draft_entry = BlogEntryPage.objects.create(blog=self.blog)
@@ -1134,6 +1145,13 @@ class TestAuthorModel(TransactionTestCase):
 
 class TestBlogPageViews(TestCase):
     pass
+
+
+@override_settings(SITE_ID='')
+class TestManagers(TestCase):
+
+    def test_missing_site_handling(self):
+        self.assertEqual(list(BlogEntryPage.objects.on_site()), [])
 
 
 class TestSitemap(TestCase):

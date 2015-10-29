@@ -9,6 +9,7 @@ UPLOAD_TO_PREFIX = getattr(
 USE_FILER_STORAGE = getattr(
     settings, 'BLOGGER_USE_FILER_STORAGE', False)
 
+
 def _get_image_storage():
     if USE_FILER_STORAGE:
         engine = filer_settings.FILER_STORAGES['public']['main']['ENGINE']
