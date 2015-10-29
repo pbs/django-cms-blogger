@@ -54,6 +54,9 @@
         #id_body_tbl{
             border: 0 !important;
         }
+	fieldset.form-horizontal textarea {
+	    height: 150px;
+	}
         fieldset.form-horizontal textarea, fieldset.form-horizontal input[type="text"], 
         fieldset.form-horizontal input[type="password"], fieldset.form-horizontal input[type="datetime"], 
         fieldset.form-horizontal input[type="datetime-local"], fieldset.form-horizontal input[type="date"], 
