@@ -13,7 +13,7 @@ from django.db import IntegrityError
 from dateutil import tz, parser
 
 from cms_blogger.models import *
-from cms_blogger import admin, forms
+from cms_blogger import admin, forms, utils
 from cms.api import create_page, add_plugin
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from menus.menu_pool import menu_pool
@@ -28,6 +28,8 @@ import urlparse
 import urllib
 
 import pytest
+import PIL.Image
+
 
 class TestMoveAction(TestCase):
     def super_user(self):
@@ -1332,3 +1334,44 @@ class TestSitemap(TestCase):
         self.assertEqual(len(locations), len(lastmods))
         for lastmod in lastmods:
             self.assertIsNot(lastmod, None)
+
+
+class ResizeSpecs(object):
+    POSTER_IMAGE_ASPECT_RATIO = 16.0 / 9.0
+    POSTER_MIN_IMAGE_WIDTH = 640
+    POSTER_MIN_IMAGE_HEIGHT = 360
+    POSTER_IMAGE_WIDTH = 1280
+    POSTER_IMAGE_HEIGHT = 720
+
+    @classmethod
+    def too_large(cls):
+        return (cls.POSTER_IMAGE_WIDTH * 2, cls.POSTER_IMAGE_HEIGHT * 2)
+
+    @classmethod
+    def too_small(cls):
+        return (cls.POSTER_MIN_IMAGE_WIDTH / 2, cls.POSTER_IMAGE_HEIGHT)
+
+    @classmethod
+    def just_right(cls):
+        return ((cls.POSTER_IMAGE_WIDTH + cls.POSTER_MIN_IMAGE_WIDTH) / 2,
+                (cls.POSTER_IMAGE_HEIGHT + cls.POSTER_MIN_IMAGE_HEIGHT) / 2)
+
+
+
+@pytest.mark.parametrize("specs", (ResizeSpecs.too_small(),
+                                   ResizeSpecs.just_right(),
+                                   ResizeSpecs.too_large()))
+def test_resize(specs):
+    filename = 'input_image.jpg'
+    input_image = PIL.Image.new('RGBA', specs, 'red')
+    contentfile = utils.image_to_contentfile(image=input_image,
+                                             filename=filename)
+    resized_contentfile = utils.resize_image(contentfile, ResizeSpecs)
+    resized_image = PIL.Image.open(resized_contentfile)
+    width, height = resized_image.size
+    assert (ResizeSpecs.POSTER_MIN_IMAGE_WIDTH <= width and
+            width <= ResizeSpecs.POSTER_IMAGE_WIDTH)
+    assert (ResizeSpecs.POSTER_MIN_IMAGE_HEIGHT <= height and
+            height <= ResizeSpecs.POSTER_IMAGE_HEIGHT)
+
+

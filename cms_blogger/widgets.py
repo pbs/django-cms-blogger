@@ -3,9 +3,8 @@ from django.utils.safestring import mark_safe
 from django.contrib.admin.templatetags.admin_static import static
 from dateutil import tz, parser
 from django.template.loader import render_to_string
-from .settings import (MAXIMUM_THUMBNAIL_FILE_SIZE,
-                       ALLOWED_THUMBNAIL_IMAGE_TYPES)
 
+from . import settings
 
 class ToggleWidget(forms.widgets.CheckboxInput):
 
@@ -163,8 +162,10 @@ class PosterImage(forms.widgets.CheckboxInput):
             {
                 'blog_entry_id': self.blog_entry_id,
                 'image_url': self.image_url,
-                'size_limit': MAXIMUM_THUMBNAIL_FILE_SIZE,
-                'image_types': ALLOWED_THUMBNAIL_IMAGE_TYPES,
+                'size_limit': settings.MAXIMUM_THUMBNAIL_FILE_SIZE,
+                'image_types': settings.ALLOWED_THUMBNAIL_IMAGE_TYPES,
+                'poster_width': settings.POSTER_IMAGE_WIDTH,
+                'poster_height': settings.POSTER_IMAGE_HEIGHT,
             }
         )
 
