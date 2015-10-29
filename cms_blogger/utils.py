@@ -116,10 +116,14 @@ def image_to_contentfile(image, filename):
 def calculate_resized_poster_size(size, specs):
     """
     Returns a size tuple with the proper width and height within specs
-    bounds
+    bounds. The resulting size keeps aspect ratio from the
+    specifications, and will be bounded by the mininum and maximum
+    width. If the width is within these bounds it will only resize the
+    height to match the aspect ratio.
 
     :param size: the width, height size tuple
     :param specs: the namespace that contains POSTER_* attributes
+
     """
     width, height = size
     poster_width = min(max(specs.POSTER_MIN_IMAGE_WIDTH, width),
@@ -152,9 +156,9 @@ def resize_image(image_file, specs=settings, resizer=PIL.Image):
     image.thumbnail(poster_size, resizer.ANTIALIAS)
     thumbnail_width, thumbnail_height = image.size
     poster_image = resizer.new('RGBA', poster_size, 'white')
-    center_point = ((poster_width - thumbnail_width) / 2,
-                    (poster_height - thumbnail_height) / 2)
-    poster_image.paste(image, center_point)
+    top_left_margin_point = ((poster_width - thumbnail_width) / 2,
+                             (poster_height - thumbnail_height) / 2)
+    poster_image.paste(image, top_left_margin_point)
     filename, _ = os.path.splitext(os.path.basename(image_file.name))
     filepath = ''.join((filename, os.path.extsep, 'png'))
     django_image_file = image_to_contentfile(poster_image, filepath)
