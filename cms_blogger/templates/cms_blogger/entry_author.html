@@ -1,3 +1,33 @@
+<script>
+String.prototype.supplant = String.prototype.supplant || function (o) {
+    return this.replace(
+        /{([^{}]*)}/g,
+        function (a, b) {
+          var r = o[b];
+          return typeof r === 'string' || typeof r === 'number' ? r : a;
+        }
+    );
+};
+
+Date.prototype.getShortDate = Date.prototype.getShortDate || function () {
+      var date_format, date_string, month, hours24, minutes;
+
+      date_format = "{month} {day}, {year} at {hours}:{minutes} {meridian}";
+      hours24 = this.getHours();
+      month = this.getShortMonthString();
+      minutes = this.getMinutes();
+
+      date_string = date_format.supplant({
+	     month: month[0] + month.slice(1).toLowerCase(),
+             year: this.getYear() + 1900,
+	     day: this.get2DigitDayString(),
+	     hours: hours24 % 12 || 12,
+	     minutes: minutes < 10 ? '0' + minutes : minutes,
+             meridian: hours24 >= 12 ? 'pm' : 'am'
+      })
+      return date_string;
+};
+</script>
 <h5 class="subtitle">
   {% if is_updated %} Last Updated
   {% else %} Posted
