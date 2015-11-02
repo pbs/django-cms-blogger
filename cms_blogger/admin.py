@@ -32,7 +32,7 @@ from .models import (
 from .admin_helper import AdminHelper, WizardForm
 from .settings import ALLOWED_THUMBNAIL_IMAGE_TYPES
 from .widgets import ToggleWidget
-from .utils import resize_image, get_allowed_sites, get_current_site
+from . import utils
 import imghdr
 import json
 import os
@@ -228,13 +228,13 @@ class AbstractBlogAdmin(AdminHelper):
 
     # PERMISSIONS
     def get_current_site(self, request):
-        return get_current_site(request, self.model)
+        return utils.get_current_site(request, self.model)
 
     def _is_allowed(self, request, obj=None):
         if request.user.is_superuser:
             return True
         current_site = self.get_current_site(request)
-        return current_site in get_allowed_sites(request, self.model)
+        return current_site in utils.get_allowed_sites(request, self.model)
 
     def has_add_permission(self, request):
         can_add = super(AbstractBlogAdmin, self).has_add_permission(request)
@@ -353,16 +353,16 @@ class HomeBlogAdmin(AbstractBlogAdmin):
         qs = super(HomeBlogAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(site__in=get_allowed_sites(request, self.model))
+        return qs.filter(site__in=utils.get_allowed_sites(request, self.model))
 
     def _is_allowed(self, request, obj=None):
         if request.user.is_superuser:
             return True
-        return get_allowed_sites(request, self.model).exists()
+        return utils.get_allowed_sites(request, self.model).exists()
 
     def has_add_permission(self, request):
         can_add = super(AbstractBlogAdmin, self).has_add_permission(request)
-        sites_without_home_blog = get_allowed_sites(request, self.model)\
+        sites_without_home_blog = utils.get_allowed_sites(request, self.model)\
             .filter(homeblog__isnull=True).exists()
         return can_add and sites_without_home_blog
 
@@ -542,7 +542,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
                     "Image width and height should be greater than 0px")
             try:
                 upload.name = ''.join((filename, os.path.extsep, extension))
-                blog_entry.poster_image = resize_image(upload)
+                blog_entry.poster_image = utils.resize_image(upload)
             except Exception as e:
                 raise UploadException("Cannot resize image: %s" % e.message)
             # save new image
@@ -709,7 +709,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         if request.user.is_superuser:
             return True
         return Blog.objects.filter(
-            site__in=get_allowed_sites(request, self.model),
+            site__in=utils.get_allowed_sites(request, self.model),
             allowed_users=request.user
         ).exists()
 

@@ -1375,3 +1375,9 @@ def test_resize(specs):
             height <= ResizeSpecs.POSTER_IMAGE_HEIGHT)
 
 
+def test_file_with_extension():
+    initial_path = '/files/example.txt'
+    extension = 'pdf'
+    file_object = utils.NamedBytesIO(name=initial_path)
+    basename = utils.basename_with_extension(file_object, extension)
+    assert basename == 'example.pdf'

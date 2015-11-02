@@ -132,6 +132,19 @@ def calculate_resized_poster_size(size, specs):
     return poster_width, poster_height
 
 
+def basename_with_extension(file_object, extension='png'):
+    """
+    Returns the filepath of the input file_object swapped with 
+    the given extension.
+
+    :param file_object: the input file object
+    :param extension: the desired new file extension
+    """
+    filename, _ = os.path.splitext(os.path.basename(file_object.name))
+    name = ''.join((filename, os.path.extsep, extension))
+    return name
+
+
 def resize_image(image_file, specs=settings, resizer=PIL.Image):
     """
     Resizes an image file based on the width and aspect ratio
@@ -155,11 +168,11 @@ def resize_image(image_file, specs=settings, resizer=PIL.Image):
     poster_width, poster_height = poster_size
     image.thumbnail(poster_size, resizer.ANTIALIAS)
     thumbnail_width, thumbnail_height = image.size
-    poster_image = resizer.new('RGBA', poster_size, 'white')
+    transparency = (255, 255, 255, 0)
+    poster_image = resizer.new('RGBA', poster_size, transparency)
     top_left_margin_point = ((poster_width - thumbnail_width) / 2,
                              (poster_height - thumbnail_height) / 2)
     poster_image.paste(image, top_left_margin_point)
-    filename, _ = os.path.splitext(os.path.basename(image_file.name))
-    filepath = ''.join((filename, os.path.extsep, 'png'))
-    django_image_file = image_to_contentfile(poster_image, filepath)
+    filename = basename_with_extension(image_file, extension='png')
+    django_image_file = image_to_contentfile(poster_image, filename)
     return django_image_file
