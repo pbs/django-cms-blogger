@@ -98,15 +98,16 @@ class NamedBytesIO(io.BytesIO):
         super(NamedBytesIO, self).__init__(*args, **kwargs)
 
 
-def image_to_contentfile(image, filename):
+def image_to_contentfile(image, filename, quality):
     """
     Returns a named bytestream of the input image
 
     :param image: the image to be stored
     :param filename: the name of the outputfile
+    :param quality: the quality of the image
     """
     named_content = NamedBytesIO(name=filename)
-    image.save(named_content)
+    image.save(named_content, quality=quality)
     out_file = ContentFile(content=named_content.getvalue(),
                            name=filename)
     out_file.close()
@@ -132,17 +133,34 @@ def calculate_resized_poster_size(size, specs):
     return poster_width, poster_height
 
 
-def basename_with_extension(file_object, extension='png'):
+def basename_with_extension(filepath, extension='png'):
     """
-    Returns the filepath of the input file_object swapped with 
+    Returns the filepath of the input file_object swapped with
     the given extension.
 
     :param file_object: the input file object
     :param extension: the desired new file extension
     """
-    filename, _ = os.path.splitext(os.path.basename(file_object.name))
+    filename, _ = os.path.splitext(os.path.basename(filepath))
     name = ''.join((filename, os.path.extsep, extension))
     return name
+
+
+def fill_background_image(image, background):
+    """
+    Returns an image of a certain size that contains the input image
+    filled with the given color.
+
+    :param image: the input image
+    :param background: the background image
+
+    """
+    output_width, output_height = background.size
+    input_width, input_height = image.size
+    top_left_margin_point = ((output_width - input_width) / 2,
+                             (output_height - input_height) / 2)
+    background.paste(image, top_left_margin_point)
+    return background
 
 
 def resize_image(image_file, specs=settings, resizer=PIL.Image):
@@ -164,15 +182,18 @@ def resize_image(image_file, specs=settings, resizer=PIL.Image):
         message = message_format.format(image=image_file.name, error=e)
         raise IOError(message)
     image.load()
-    poster_size = calculate_resized_poster_size(image.size, specs)
-    poster_width, poster_height = poster_size
-    image.thumbnail(poster_size, resizer.ANTIALIAS)
-    thumbnail_width, thumbnail_height = image.size
-    transparency = (255, 255, 255, 0)
-    poster_image = resizer.new('RGBA', poster_size, transparency)
-    top_left_margin_point = ((poster_width - thumbnail_width) / 2,
-                             (poster_height - thumbnail_height) / 2)
-    poster_image.paste(image, top_left_margin_point)
-    filename = basename_with_extension(image_file, extension='png')
-    django_image_file = image_to_contentfile(poster_image, filename)
+    options = {
+        'mode': 'RGBA',
+        'size': calculate_resized_poster_size(image.size, specs),
+        'color': specs.POSTER_IMAGE_FILL_COLOR,
+    }
+    if options.get('color'):    # we need png to have a trasparent background
+        image.thumbnail(options.get('size'), resizer.ANTIALIAS)
+        poster_image = fill_background_image(image, resizer.new(**options))
+        filename = basename_with_extension(image_file.name, extension='png')
+    else:
+        poster_image = image
+        filename = image_file.name
+    django_image_file = image_to_contentfile(poster_image, filename,
+                                             specs.POSTER_IMAGE_COMPRESSION)
     return django_image_file
