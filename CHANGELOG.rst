@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+Revision 387b5cb (04.11.2015, 15:07 UTC)
+----------------------------------------
+
+* LUN-2598
+
+  * Shorter height for blog entry page short description..
+
+* LUN-2739
+
+  * Change variable name, add docs.
+  * Change poster_image.html
+  * Remove unused import.
+  * Use parametric resize tests.
+  * Add resize large image test.
+  * More work on tests.
+  * Fix image resize.
+
+* LUN-2769
+
+  * Move date js code back into template tag.
+
+No other commits.
+
 Revision 368d0c0 (28.10.2015, 12:05 UTC)
 ----------------------------------------
 
