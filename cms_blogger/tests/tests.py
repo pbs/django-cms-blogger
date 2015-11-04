@@ -1342,6 +1342,8 @@ class ResizeSpecs(object):
     POSTER_MIN_IMAGE_HEIGHT = 360
     POSTER_IMAGE_WIDTH = 1280
     POSTER_IMAGE_HEIGHT = 720
+    POSTER_IMAGE_FILL_COLOR = (255, 255, 255, 0)
+    POSTER_IMAGE_COMPRESSION = 100
 
     @classmethod
     def too_large(cls):
@@ -1361,11 +1363,12 @@ class ResizeSpecs(object):
 @pytest.mark.parametrize("specs", (ResizeSpecs.too_small(),
                                    ResizeSpecs.just_right(),
                                    ResizeSpecs.too_large()))
-def test_resize(specs):
+def test_fill_resize(specs):
     filename = 'input_image.jpg'
     input_image = PIL.Image.new('RGBA', specs, 'red')
     contentfile = utils.image_to_contentfile(image=input_image,
-                                             filename=filename)
+                                             filename=filename,
+                                             quality=100)
     resized_contentfile = utils.resize_image(contentfile, ResizeSpecs)
     resized_image = PIL.Image.open(resized_contentfile)
     width, height = resized_image.size
@@ -1375,3 +1378,9 @@ def test_resize(specs):
             height <= ResizeSpecs.POSTER_IMAGE_HEIGHT)
 
 
+def test_file_with_extension():
+    initial_path = '/files/example.txt'
+    extension = 'pdf'
+    file_object = utils.NamedBytesIO(name=initial_path)
+    basename = utils.basename_with_extension(file_object.name, extension)
+    assert basename == 'example.pdf'
