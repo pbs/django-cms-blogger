@@ -4,9 +4,9 @@
     "use strict";
 
     function Blogger(){
-
         this.init = function(){
             normalizeSocialURLs();
+            resizeImages()
             domChanges();
         };
 
@@ -58,6 +58,20 @@
             }
 
             return s;
+        }
+
+        function resizeHandler() {
+            var width, height, css;
+
+            width = $('.entry-image-container').width();
+            height = Math.round(width / (16.0 / 9.0)) + 'px';
+            css = {'max-height': height};
+            $('img.entry-image').css(css);
+        }
+
+        function resizeImages() {
+            resizeHandler();
+            $(window).on('resize', resizeHandler);
         }
 
         function normalizeSocialURLs(){
