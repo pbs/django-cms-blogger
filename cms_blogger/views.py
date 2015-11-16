@@ -3,11 +3,13 @@ from django.template.context import RequestContext
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
 from django.db.models import Q
+from django.utils import timezone as django_timezone
 from cms_layouts.layout_response import LayoutResponse
 from .models import BlogEntryPage, Blog, HomeBlog, BlogCategory
 from .settings import POSTS_ON_LANDING_PAGE
 from .utils import paginate_queryset
 import re
+import pytz
 
 
 def get_blog_or_404(slug):
@@ -26,8 +28,20 @@ def get_entries_queryset(request):
 
 
 def entry_page(request, blog_slug, year, month, day, entry_slug):
+    """
+    View for rendering a blog entry page.
+
+    Timezone changes notes:
+    The URL provided to access the blog post represents the date in UTC.
+    Making the query with the user timezone will cause missmatches.
+    without activate: match tz_transform(UTC DB date, client_tz) with provided UTC url
+    with activate: match UTC DB date with provided UTC url
+
+    Date matching is not essential because the slug should be unique.
+    """
     entry_qs = get_entries_queryset(request)
     try:
+        django_timezone.activate(pytz.utc)
         entry = entry_qs.get(
             publication_date__year=year,
             publication_date__month=month,
@@ -36,6 +50,9 @@ def entry_page(request, blog_slug, year, month, day, entry_slug):
             blog__entries_slugs_with_date=True)
     except BlogEntryPage.DoesNotExist:
         raise Http404
+    finally:
+        django_timezone.deactivate()
+
     return entry.render_to_response(request)
 
 

@@ -29,6 +29,7 @@ import urllib
 
 import pytest
 import PIL.Image
+import pytz
 
 
 class TestMoveAction(TestCase):
@@ -1145,8 +1146,34 @@ class TestAuthorModel(TransactionTestCase):
             Author.objects.bulk_create([Author(slug='one'), ] * 2)
 
 
-class TestBlogPageViews(TestCase):
-    pass
+class TestBlogPageViews(TestBlogModel):
+
+    @override_settings(TIME_ZONE="America/New_York")
+    def test_timezone_correct_handling(self):
+        """
+        Presumption:
+        Blog entries urls are in UTC
+        Tested issue:
+        The code handled as the URL was in the timezone of the client, which did not
+        the actual published date in the database.
+        """
+        blog, _ = self._make_blog()
+        entry = self._make_entry(blog=blog)
+        entry.is_published = True
+        entry.publication_date = datetime.datetime(2014, 5, 23, 0, 30, tzinfo=pytz.utc)
+        entry.save()
+        blog.entries_slugs_with_date = True
+        blog.save()
+        entry_url = reverse(
+            'cms_blogger.views.entry_page', kwargs={
+                'blog_slug': 'one-title',
+                'year': entry.publication_date.year,
+                'month': entry.publication_date.strftime('%m'),
+                'day': entry.publication_date.strftime('%d'),
+                'entry_slug': 'first-entry'})
+
+        self.assertEquals(entry.get_absolute_url(), entry_url)
+        self.assertEquals(self.client.get(entry_url).status_code, 200)
 
 
 @override_settings(SITE_ID='')
