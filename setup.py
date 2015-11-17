@@ -19,7 +19,7 @@ DEPENDENCY_LINKS = [
 
 setup(
     name='django-cms-blogger',
-    version='0.7.0.pbs.11',
+    version='0.7.0.pbs.12',
     description='Django CMS blogging tool that lets users create blogs '
                 'using layouts created from CMS pages.',
     long_description=open(README, 'r').read(),
