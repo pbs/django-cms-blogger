@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+Revision c562a5d (17.11.2015, 09:23 UTC)
+----------------------------------------
+
+* LUN-2739
+
+  * entry image uploader, fix entry image progress
+
+* LUN-2749
+
+  * Searching for an entry with the date in the URL should be made in UTC.
+
+* LUN-2770
+
+  * Don't round, allow subpixel rendering
+  * Add js css changes.
+  * Fix tests.
+  * Clean up namespace clashes.
+
+No other commits.
+
 Revision 387b5cb (04.11.2015, 15:07 UTC)
 ----------------------------------------
 
