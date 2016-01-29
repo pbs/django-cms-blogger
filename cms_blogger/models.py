@@ -237,12 +237,15 @@ class OrderEntriesSequenceMixin(object):
         """
         if not self.blog:
             return None
+        if hasattr(self, '_previous_post'):
+            return self._previous_post
         siblings = self.blog.get_entries().exclude(id=self.id)
         order_by = ['-' + o.strip('-')
                     for o in self.blog.entries_ordering.split(',')]
         prev_entries = self.order_table('previous')[self.blog.entries_ordering]
         prev_post = siblings.filter(prev_entries).order_by(*order_by)[:1]
-        return prev_post[0] if prev_post else None
+        self._previous_post = prev_post[0] if prev_post else None
+        return self._previous_post
 
     def next_post(self):
         """
@@ -252,12 +255,15 @@ class OrderEntriesSequenceMixin(object):
         """
         if not self.blog:
             return None
+        if hasattr(self, '_next_post'):
+            return self._next_post
         siblings = self.blog.get_entries().exclude(id=self.id)
         order_by = [o.strip('-')
                     for o in self.blog.entries_ordering.split(',')]
         next_entries = self.order_table('next')[self.blog.entries_ordering]
         next_post = siblings.filter(next_entries).order_by(*order_by)[:1]
-        return next_post[0] if next_post else None
+        self._next_post = next_post[0] if next_post else None
+        return self._next_post
 
 
 @contribute_with_title
