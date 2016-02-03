@@ -13,20 +13,18 @@
         }
         var {{date_var}} = new Date({{utc_millis}});
     </script>
-    <div class="month">
-        <script type="text/javascript">document.write({{date_var}}.getShortMonthString())</script>
+    <div class="month" id="month_{{date_var}}">
     </div>
-    <div class="day">
-        <script type="text/javascript">document.write({{date_var}}.get2DigitDayString())</script>
+    <div class="day" id="day_{{date_var}}">
     </div>
     {% if show_year %}
-    <div class="year">
-        <script type="text/javascript">
-	  document.write(
-               {{date_var}}.getYear() < (new Date()).getYear() ? {{date_var}}.getFullYear() : ""
-	   )
-        </script>
+    <div class="year" id="year_{{date_var}}">
     </div>
     {% endif %}
+    <script type="text/javascript">
+    document.getElementById('month_{{date_var}}').innerHTML = {{date_var}}.getShortMonthString();
+    document.getElementById('day_{{date_var}}').innerHTML = {{date_var}}.get2DigitDayString();
+    document.getElementById('year_{{date_var}}').innerHTML = {{date_var}}.getYear() < (new Date()).getYear() ? {{date_var}}.getFullYear() : "";
+    </script>
 </div>
 {% endspaceless %}

@@ -34,9 +34,9 @@ Date.prototype.getShortDate = Date.prototype.getShortDate || function () {
   {% endif %}
   {% if author_names %} by <span class="author">{{author_names}}</span>
   {% endif %}
-  <span class="author-pub-time"> on
+  <span class="author-pub-time"> on <span id="author-pub-time_{{date_var}}"></span>
     <script type="text/javascript">
-      document.write((new Date({{utc_millis}})).getShortDate());
+      document.getElementById('author-pub-time_{{date_var}}').innerHTML = new Date({{utc_millis}}).getShortDate();
     </script>
   </span>
   <span class="author-extra">
