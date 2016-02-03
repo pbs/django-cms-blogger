@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_static import static
-from django.contrib.contenttypes.generic import GenericTabularInline
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.core.exceptions import PermissionDenied
 from django.core.files.images import get_image_dimensions
 from django.core.urlresolvers import reverse
@@ -32,7 +32,7 @@ from .models import (
 from .admin_helper import AdminHelper, WizardForm
 from .settings import ALLOWED_THUMBNAIL_IMAGE_TYPES
 from .widgets import ToggleWidget
-from .utils import resize_image, get_allowed_sites, get_current_site
+from . import utils
 import imghdr
 import json
 import os
@@ -96,13 +96,15 @@ class AbstractBlogAdmin(AdminHelper):
     formfield_overrides = {
         models.BooleanField: {'widget': ToggleWidget}
     }
+    raw_id_fields = ('branding_image', )
+
     class Media:
         css = {
             'all': (static('cms_blogger/css/redmond-jquery-ui.css'), )}
         js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
               static("cms_blogger/js/jquery-ui.min.js"), )
 
-    #### NAVIGATION ####
+    # NAVIGATION
     def _get_nodes(self, request, nodes, node_id, output):
         for node in nodes:
             if node.id == node_id:
@@ -140,10 +142,11 @@ class AbstractBlogAdmin(AdminHelper):
                           args=[obj.id])
             output = []
             output.append(
-                u'<a href="%s" class="add-another btn btn-primary btn-xs" id="add_id_navigation_node"'
-                ' onclick="return showNavigationPopup(this);"> ' % url)
-            output.append(
-                u'Open Navigation Tool</a>')
+                u'<a href="%s" class="btn btn-primary btn-xs" '
+                u'id="add_id_navigation_node"'
+                u' onclick="return showNavigationPopup(this);"> '
+                u'<i class="fa fa-search"></i>'
+                u'Open Navigation Tool</a>' % url)
             preview = self._navigation_preview(request, nav_node)
             hide = 'style="display:none"'
             if preview:
@@ -159,17 +162,17 @@ class AbstractBlogAdmin(AdminHelper):
     location_in_navigation.allow_tags = True
     location_in_navigation.short_description = 'Select location'
 
-    def get_formsets(self, request, obj=None):
+    def get_formsets_with_inlines(self, request, obj=None):
         # show layout inline only for valid existing blogs
         if obj and obj.pk and obj.layouts.exists():
             # set request for navigation_preview
             obj._request_for_navigation_preview = request
-            return super(AbstractBlogAdmin, self).get_formsets(request, obj)
+            return super(AbstractBlogAdmin,
+                         self).get_formsets_with_inlines(request, obj)
         return []
 
     def navigation_tool(self, request, blog_id):
-        if (request.method not in ['GET', 'POST'] or
-                not "_popup" in request.REQUEST):
+        if ('_popup' not in request.GET and '_popup' not in request.POST):
             raise PermissionDenied
 
         blog = get_object_or_404(self.model, id=blog_id)
@@ -199,7 +202,7 @@ class AbstractBlogAdmin(AdminHelper):
         context = RequestContext(request)
         context.update({
             'title': 'Edit navigation menu',
-            'is_popup': "_popup" in request.REQUEST
+            'is_popup': "_popup" in request.GET or '_popup' in request.POST
         })
         if blog.navigation_node:
             context.update({'initial_blog_node': blog.navigation_node, })
@@ -223,15 +226,15 @@ class AbstractBlogAdmin(AdminHelper):
         return blog_obj.title
     displayed_title.short_description = 'Title'
 
-    ### PERMISSIONS ###
+    # PERMISSIONS
     def get_current_site(self, request):
-        return get_current_site(request, self.model)
+        return utils.get_current_site(request, self.model)
 
     def _is_allowed(self, request, obj=None):
         if request.user.is_superuser:
             return True
         current_site = self.get_current_site(request)
-        return current_site in get_allowed_sites(request, self.model)
+        return current_site in utils.get_allowed_sites(request, self.model)
 
     def has_add_permission(self, request):
         can_add = super(AbstractBlogAdmin, self).has_add_permission(request)
@@ -281,7 +284,7 @@ class BlogAdmin(AbstractBlogAdmin):
     change_form_fieldsets = (
         ('Blog setup', {
             'fields': ['site', 'title', 'slug', 'tagline', 'branding_image',
-                       'categories'],
+                       'categories', 'entries_ordering'],
             'classes': ('extrapretty', ),
             'description': _('Blog Setup Description')
         }),
@@ -327,14 +330,15 @@ class HomeBlogAdmin(AbstractBlogAdmin):
                    show_next=True),
         WizardForm(form=forms.HomeBlogForm,
                    fieldsets='change_form_fieldsets',
-                   readonly= ['site', 'location_in_navigation'],
+                   readonly=['site', 'location_in_navigation'],
                    when=lambda obj: bool(obj))
     )
     add_form_fieldsets = (
         (None, {'fields': ['site', 'title', ], 'classes': ('general', )}), )
     change_form_fieldsets = (
         (None, {
-            'fields': ('site', 'title', 'tagline', 'branding_image'),
+            'fields': ('site', 'title', 'tagline',
+                       'branding_image', 'entries_ordering',),
             'classes': ('extrapretty',),
             'description': _('Home Blog Setup Description')
         }),
@@ -344,21 +348,21 @@ class HomeBlogAdmin(AbstractBlogAdmin):
         }),
     )
 
-    ### PERMISSIONS ###
+    # PERMISSIONS
     def get_queryset(self, request):
         qs = super(HomeBlogAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(site__in=get_allowed_sites(request, self.model))
+        return qs.filter(site__in=utils.get_allowed_sites(request, self.model))
 
     def _is_allowed(self, request, obj=None):
         if request.user.is_superuser:
             return True
-        return get_allowed_sites(request, self.model).exists()
+        return utils.get_allowed_sites(request, self.model).exists()
 
     def has_add_permission(self, request):
         can_add = super(AbstractBlogAdmin, self).has_add_permission(request)
-        sites_without_home_blog = get_allowed_sites(request, self.model)\
+        sites_without_home_blog = utils.get_allowed_sites(request, self.model)\
             .filter(homeblog__isnull=True).exists()
         return can_add and sites_without_home_blog
 
@@ -376,7 +380,7 @@ class CurrentSiteBlogFilter(admin.filters.RelatedFieldListFilter):
 class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
     list_editable = ('is_published', )
     custom_changelist_class = changelists.BlogEntryChangeList
-    list_display = ('__str__', 'slug', 'blog', 'is_published', 'published_at',
+    list_display = ('__str__', 'slug', 'blog', 'is_published', 'updated_at',
                     'entry_authors', 'categories_assigned')
     list_filter = (('blog', CurrentSiteBlogFilter), )
     list_per_page = 50
@@ -421,14 +425,12 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         ('Schedule Publish', {
             'fields': ['start_publication', 'schedule_publish'],
             'description': _('Schedule Start Date description'),
-            'classes': ('right-col', 'collapse', 'collapsible-inner', 'hide-label',
-                        'closed')
+            'classes': ('right-col', 'hide-label')
         }),
         ('Schedule Unpublish', {
             'fields': ['end_publication', 'schedule_unpublish'],
             'description': _('Schedule End Date description'),
-            'classes': ('right-col', 'collapse', 'collapsible-inner', 'hide-label',
-                        'closed')
+            'classes': ('right-col', 'hide-label')
         }),
         (None, {
             'fields': ['categories', ],
@@ -500,7 +502,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         url_patterns.extend(urls)
         return url_patterns
 
-    ### CUSTOM VIEWS ###
+    # CUSTOM VIEWS
     def preview(self, request, entry_id):
         entry = get_object_or_404(self.model, id=entry_id)
         if 'body' in request.POST:
@@ -540,7 +542,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
                     "Image width and height should be greater than 0px")
             try:
                 upload.name = ''.join((filename, os.path.extsep, extension))
-                blog_entry.poster_image = resize_image(upload)
+                blog_entry.poster_image = utils.resize_image(upload)
             except Exception as e:
                 raise UploadException("Cannot resize image: %s" % e.message)
             # save new image
@@ -634,7 +636,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         messages.success(request, message)
         return redirect(reverse('admin:cms_blogger_blogentrypage_changelist'))
 
-    ### PLACEHOLDER ADMIN VIEWS ###
+    # PLACEHOLDER ADMIN VIEWS
     def add_plugin(self, request):
         """
         Adds a plugin the the hidded placeholder of the blog entry.
@@ -656,7 +658,7 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         setattr(request, 'current_page', entry.get_layout().from_page)
         return super(BlogEntryPageAdmin, self).edit_plugin(request, plugin_id)
 
-    ### BULK ACTIONS ###
+    # BULK ACTIONS
     def make_published(self, request, queryset):
         # cannot publish draft entries
         draft_entries = Q(Q(title__isnull=True) | Q(title__exact='') |
@@ -681,33 +683,33 @@ class BlogEntryPageAdmin(AdminHelper, PlaceholderAdmin):
         return redirect(url)
     move_entries.short_description = "Move entries to another blog"
 
-    ### CUSTOM ADMIN COLUMNS ###
+    # CUSTOM ADMIN COLUMNS
     def entry_authors(self, entry):
         return entry.authors_display_name
     entry_authors.allow_tags = True
 
-    def published_at(self, entry):
+    def updated_at(self, entry):
         from cms_blogger.templatetags.blogger import publish_date_box
         return (
             '<script type="text/javascript">'
             'document.write(moment(%s).format("DD MMM YYYY hh:mm A"));'
             '</script>' % publish_date_box(entry).get('utc_millis'))
-    published_at.allow_tags = True
+    updated_at.allow_tags = True
 
     def categories_assigned(self, entry):
-        category_names = list(entry.categories
-            .values_list('name', flat=True).order_by('name'))
+        category_names = list(entry.categories.values_list(
+            'name', flat=True).order_by('name'))
         text = ', '.join(category_names)
         max_len = 70
         return text if len(text) <= max_len else (text[:max_len-3] + '...')
     categories_assigned.short_description = 'Categories'
 
-    ### PERMISSIONS ###
+    # PERMISSIONS
     def _is_allowed(self, request):
         if request.user.is_superuser:
             return True
         return Blog.objects.filter(
-            site__in=get_allowed_sites(request, self.model),
+            site__in=utils.get_allowed_sites(request, self.model),
             allowed_users=request.user
         ).exists()
 
@@ -768,8 +770,8 @@ def _move_entries(destination_blog, entries_ids, mirror_categories=True):
     for blogentry in BlogEntryPage.objects.filter(id__in=entries_ids):
         previous_categories = list(blogentry.categories.values_list(
             'name', flat=True))
-        #performance improvement by assigning m2m queryset instead of clearing
-        # and reassigning
+        # performance improvement by assigning m2m queryset instead of clearing
+        #  and reassigning
         blogentry.categories.clear()
         destination_categories = BlogCategory.objects.filter(
             blog=destination_blog, name__in=previous_categories)

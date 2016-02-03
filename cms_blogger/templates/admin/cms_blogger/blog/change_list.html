@@ -19,12 +19,18 @@
 {% endif %}
 {% endblock %}
 
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/chosen.min.css" />
+{{ block.super }}
+{% endblock %}
+
 {% block extrahead %}
 {{block.super}}
 <script type="text/javascript" src="{{ STATIC_URL }}cms_blogger/js/jQuery-patch.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/chosen.jquery.min.js"></script>
 
 <script type="text/javascript">
 CMS.$(document).unbind('ready.cms_blogger')
@@ -32,10 +38,13 @@ CMS.$(document).bind('ready.cms_blogger', function(){
     CMS.$('#site-select').change(function(event){
             window.location.href = window.location.pathname + "?{{cl.site_lookup}}=" + this.value;
         });
+    {% if cl.has_access_to_multiple_sites %}
+    CMS.$("#site-select").chosen();
+    {% endif %}
 })
 </script>
 {% endblock %}
-{% block coltype %}{{block.super}} with-site-selector{% endblock %} 
+{% block coltype %}{{block.super}} with-site-selector{% endblock %}
 {% block search %}
 {% if cl.has_access_to_multiple_sites %}
     <div id="site-selector">{{cl.opts.verbose_name_plural|capfirst}} on:

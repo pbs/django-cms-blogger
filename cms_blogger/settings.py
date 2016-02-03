@@ -9,6 +9,7 @@ UPLOAD_TO_PREFIX = getattr(
 USE_FILER_STORAGE = getattr(
     settings, 'BLOGGER_USE_FILER_STORAGE', False)
 
+
 def _get_image_storage():
     if USE_FILER_STORAGE:
         engine = filer_settings.FILER_STORAGES['public']['main']['ENGINE']
@@ -34,8 +35,20 @@ ALLOWED_THUMBNAIL_IMAGE_TYPES = getattr(
 MAXIMUM_THUMBNAIL_FILE_SIZE = getattr(
     settings, 'BLOGGER_MAXIMUM_THUMBNAIL_FILE_SIZE', int(2.5 * 1024 * 1024))
 
+POSTER_IMAGE_FILL_COLOR = getattr(
+    settings, 'BLOGGER_POSTER_IMAGE_FILL_COLOR', None)
+
+POSTER_IMAGE_COMPRESSION = getattr(
+    settings, 'BLOGGER_POSTER_IMAGE_COMPRESSION', 70)
+
 POSTER_IMAGE_WIDTH = getattr(
-    settings, 'BLOGGER_POSTER_IMAGE_WIDTH', 640)
+    settings, 'BLOGGER_POSTER_IMAGE_WIDTH', 1280)
+
+POSTER_IMAGE_HEIGHT = getattr(
+    settings, 'BLOGGER_POSTER_IMAGE_WIDTH', 720)
+
+POSTER_MIN_IMAGE_WIDTH = getattr(
+    settings, 'BLOGGER_POSTER_MIN_IMAGE_WIDTH', 640)
 
 POSTER_IMAGE_ASPECT_RATIO = getattr(
     settings, 'BLOGGER_POSTER_IMAGE_ASPECT_RATIO', 16.0 / 9.0)

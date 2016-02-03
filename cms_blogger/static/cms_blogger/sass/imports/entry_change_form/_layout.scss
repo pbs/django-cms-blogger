@@ -8,7 +8,7 @@
             border:none;
             padding-right: 15px;
             margin-bottom: 19px;
-        
+
 
             & +  div.right-col{
                 width: 25%;
@@ -54,9 +54,12 @@
         #id_body_tbl{
             border: 0 !important;
         }
-        fieldset.form-horizontal textarea, fieldset.form-horizontal input[type="text"], 
-        fieldset.form-horizontal input[type="password"], fieldset.form-horizontal input[type="datetime"], 
-        fieldset.form-horizontal input[type="datetime-local"], fieldset.form-horizontal input[type="date"], 
+	fieldset.form-horizontal textarea {
+	    height: 150px;
+	}
+        fieldset.form-horizontal textarea, fieldset.form-horizontal input[type="text"],
+        fieldset.form-horizontal input[type="password"], fieldset.form-horizontal input[type="datetime"],
+        fieldset.form-horizontal input[type="datetime-local"], fieldset.form-horizontal input[type="date"],
         fieldset.form-horizontal select {
             width: 90%;
         }
@@ -68,7 +71,7 @@
 @mixin layout($ns){
     #{$ns}{
         @include overides();
-        
+
         .poster-image {
             padding: 19px;
             margin-bottom: 20px;
@@ -96,12 +99,28 @@
 
             .thumbnail {
                 width: 100%;
+                text-align: center;
+                height: 200px;
+                line-height: 200px;
+                box-sizing: content-box;
+                background: white;
+                .img-container{
+                    height: 190px;
+                    line-height: 190px;
+                }
+                img{
+                    display: inline;
+                    max-height: 100%;
+                    max-width: 100%;
+                }
+                .progress{
+                    line-height: initial;
+                    height: auto;
+                    .fileUploadProgressBar{
+                        background-color: #1b6aaa;
+                    }
+                }
             }
-        }
-        #fileUpload {
-            width: 50%;
-            min-height: 200px;
-            background: white;
         }
         .body-wrapper {
             margin-left: 16.7%;
@@ -118,6 +137,14 @@
                 margin-left: 0;
                 margin-right: 0;
             }
+            .errors {
+                #cke_id_body {
+                    border-color: #a94442 !important;
+                }
+                .cke_top {
+                    padding-left: 20px !important;
+                }
+            }
         }
         .custom-collapse {
             background: white;
@@ -130,7 +157,10 @@
             .widget-body {
                 background: transparent;
             }
-            .form-horizontal:first-child {
+            .form-horizontal.hide-label {
+                h4.header {
+                    margin-top: 0;
+                }
                 .control-label {
                     display: none;
                 }
@@ -138,10 +168,13 @@
                     width: 100%;
                     padding-right: 0;
 
+                    input[type="text"] {
+                        width: 100%;
+                    }
                 }
             }
             .description {
-                margin-top: 0px;
+                margin: 0px 0 10px;
                 padding: 0;
             }
             .custom-collapse {
@@ -190,7 +223,7 @@
                 left: 80px;
             }
             .field-enable_poster_image, .field-disqus_enabled {
-                margin-top: 15px; 
+                margin-top: 15px;
 
                 .control-label, .col-sm-9 {
                     width: 50%;

@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.contrib.contenttypes.generic import GenericRelation
+from django.contrib.contenttypes.fields import GenericRelation
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.db.models import signals
@@ -29,6 +29,7 @@ from .managers import EntriesManager
 import os
 import datetime
 import uuid
+import collections
 
 
 FILENAME_LENGTH = 100
@@ -37,19 +38,23 @@ MAX_CATEGORIES_IN_PLUGIN = 20
 
 
 def getCMSContentModel(**kwargs):
+    """
+    Notes:
+    The property names are created because the intent is to give flexibility where this is used.
+    """
+
+    # Attribute name for the content placeholder
     content_attr = kwargs.get('content_attr', 'content')
+    # Name of the property which will contain the value of the unrendered cms content
     body_attr = '%s_body' % content_attr
+    # Name of the function which will retrive the content placeholder
     plugin_getter = 'get_%s_plugin' % content_attr
+    # Default content that will be used for newly created objects
+    default_content = 'Sample content'
+    # Name of the private field containing the cached value of the unrendered cms content
+    private_body_attr = '_%s' % body_attr
 
     class ModelWithCMSContent(models.Model):
-
-        def __init__(self, *args, **kwargs):
-            super(ModelWithCMSContent, self).__init__(*args, **kwargs)
-            # initialize text plugin body
-            setattr(self, body_attr, 'Sample content')
-            plugin = getattr(self, plugin_getter)()
-            if self.pk and plugin:
-                setattr(self, body_attr, getattr(plugin, 'body'))
 
         def save(self, *args, **kwargs):
             super(ModelWithCMSContent, self).save(*args, **kwargs)
@@ -81,6 +86,20 @@ def getCMSContentModel(**kwargs):
         class Meta:
             abstract = True
 
+    def _get_content_body(instance):
+        if hasattr(instance, private_body_attr):
+            return getattr(instance, private_body_attr)
+        if not instance.pk:
+            return default_content
+        plugin = getattr(instance, plugin_getter)()
+        if plugin:
+            setattr(instance, private_body_attr, plugin.body)
+            return plugin.body
+        return default_content
+
+    def _set_content_body(instance, value):
+        setattr(instance, private_body_attr, value)
+
     def get_attached_plugin(instance):
         try:
             placeholder = getattr(instance, content_attr)
@@ -94,7 +113,7 @@ def getCMSContentModel(**kwargs):
             from cms.api import add_plugin
             new_plugin = add_plugin(
                 placeholder, 'TextPlugin', get_default_language(),
-                position='first-child', body=getattr(instance, body_attr))
+                position='first-child', body=default_content)
             return new_plugin
         first_plugin = plugins_qs[0]
         plg_instance, plg_cls = first_plugin.get_plugin_instance()
@@ -106,8 +125,7 @@ def getCMSContentModel(**kwargs):
     # set body property
     ModelWithCMSContent.add_to_class(
         body_attr,
-        property(lambda x: getattr(x, "_%s" % body_attr),
-                 lambda x, v: setattr(x, "_%s" % body_attr, v)))
+        property(_get_content_body, _set_content_body))
     ModelWithCMSContent.add_to_class(plugin_getter, get_attached_plugin)
     return ModelWithCMSContent
 
@@ -174,11 +192,84 @@ class BlogNavigationNode(models.Model):
         return self.id * -1
 
 
+class OrderEntriesMixin(object):
+    ORDER_BY_UPDATE = '-update_date,slug'
+    ORDER_BY_PUBLICATION = '-publication_date,slug'
+    ordering_choices = collections.namedtuple(
+        'EntriesOrderingChoices', ['by_update', 'by_publication'])(
+        (ORDER_BY_UPDATE, 'List blog entries by last updated'),
+        (ORDER_BY_PUBLICATION, 'List blog entries by last published'),
+    )
+
+    def get_entries(self):
+        entries = BlogEntryPage.objects.all()
+        order_by = self.entries_ordering.split(',')
+        ordered_entries = entries.order_by(*order_by)
+        return ordered_entries
+
+
+class OrderEntriesSequenceMixin(object):
+    def order_table(self, order):
+        return {
+            'next': {
+                OrderEntriesMixin.ORDER_BY_PUBLICATION: Q(
+                    Q(publication_date=self.publication_date, slug__gt=self.slug) |
+                    Q(publication_date__gt=self.publication_date)),
+                OrderEntriesMixin.ORDER_BY_UPDATE: Q(
+                    Q(update_date=self.update_date, slug__gt=self.slug) |
+                    Q(update_date__gt=self.update_date)),
+            },
+            'previous': {
+                OrderEntriesMixin.ORDER_BY_PUBLICATION: Q(
+                    Q(publication_date=self.publication_date, slug__lt=self.slug) |
+                    Q(publication_date__lt=self.publication_date)),
+                OrderEntriesMixin.ORDER_BY_UPDATE: Q(
+                    Q(update_date=self.update_date, slug__lt=self.slug) |
+                    Q(update_date__lt=self.update_date)),
+            }
+        }[order]
+
+    def previous_post(self):
+        """
+        Returns the previous blog entry based on entries ordering. When the
+        entry dates(i.e. publication or updated) date is the same, it
+        compares the slugs.
+        """
+        if not self.blog:
+            return None
+        siblings = self.blog.get_entries().exclude(id=self.id)
+        order_by = ['-' + o.strip('-')
+                    for o in self.blog.entries_ordering.split(',')]
+        prev_entries = self.order_table('previous')[self.blog.entries_ordering]
+        prev_post = siblings.filter(prev_entries).order_by(*order_by)[:1]
+        return prev_post[0] if prev_post else None
+
+    def next_post(self):
+        """
+        Returns the next blog entry based on entries ordering. When the
+        entry dates(i.e. publication or updated) date is the same, it
+        compares the slugs.
+        """
+        if not self.blog:
+            return None
+        siblings = self.blog.get_entries().exclude(id=self.id)
+        order_by = [o.strip('-')
+                    for o in self.blog.entries_ordering.split(',')]
+        next_entries = self.order_table('next')[self.blog.entries_ordering]
+        next_post = siblings.filter(next_entries).order_by(*order_by)[:1]
+        return next_post[0] if next_post else None
+
+
 @contribute_with_title
-class AbstractBlog(models.Model):
+class AbstractBlog(OrderEntriesMixin, models.Model):
     site_lookup = 'site__exact'
     is_home = False
-
+    entries_ordering = models.CharField(
+        max_length=255, blank=False, null=False,
+        choices=OrderEntriesMixin.ordering_choices,
+        default=OrderEntriesMixin.ORDER_BY_PUBLICATION,
+        help_text=_('Blog entries ordering')
+    )
     title = models.CharField(
         _('title'), max_length=50, blank=False, null=False,
         help_text=_('Blog Title'))
@@ -194,7 +285,8 @@ class AbstractBlog(models.Model):
 
     branding_image = FilerImageField(
         null=True, blank=True, on_delete=models.SET_NULL,
-        default=None, help_text=_('Blog Branding Image'))
+        default=None, help_text=_('Blog Branding Image'),
+        verbose_name=_("Branding Image"))
 
     # blog navigation
     in_navigation = models.BooleanField(
@@ -227,7 +319,7 @@ class AbstractBlog(models.Model):
         return get_template("cms_blogger/blog_content.html").render(context)
 
     def get_entries(self):
-        return BlogEntryPage.objects.none()
+        return super(AbstractBlog, self).get_entries()
 
     @property
     def attached_image(self):
@@ -265,9 +357,9 @@ class HomeBlog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = ('-update_date', 'slug')
-        site_entries = BlogEntryPage.objects.on_site(self.site)
-        return site_entries.published().order_by(*ordering)
+        entries = super(HomeBlog, self).get_entries()
+        site_entries = entries.on_site(self.site)
+        return site_entries.published()
 
     @models.permalink
     def get_absolute_url(self):
@@ -298,7 +390,6 @@ class Blog(AbstractBlog):
 
     slug = models.SlugField(
         _("slug"), max_length=50, help_text=_('Blog Slug'))
-
     entries_slugs_with_date = models.BooleanField(
         _("Dates in blog entry URLs"), default=False,
         help_text=_('Blog Entries With Slugs'),)
@@ -336,8 +427,9 @@ class Blog(AbstractBlog):
             return None
 
     def get_entries(self):
-        ordering = ('-update_date', 'slug')
-        return self.blogentrypage_set.published().order_by(*ordering)
+        entries = super(Blog, self).get_entries()
+        blog_entries = entries.filter(blog=self).published()
+        return blog_entries
 
     @models.permalink
     def get_absolute_url(self):
@@ -447,7 +539,8 @@ def get_poster_image_storage():
 
 
 @blog_page
-class BlogEntryPage(getCMSContentModel(content_attr='content'),
+class BlogEntryPage(OrderEntriesSequenceMixin,
+                    getCMSContentModel(content_attr='content'),
                     BlogRelatedPage):
     uses_layout_type = Blog.ENTRY_PAGE
     title = models.CharField(_('title'), max_length=255)
@@ -483,8 +576,8 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         _('end publication'),
         db_index=True, blank=True, null=True,
         help_text=_('End date of publication.'))
-    is_published = models.BooleanField(_('is published'),
-        blank=True, default=False,)
+    is_published = models.BooleanField(
+        _('is published'), blank=True, default=False)
 
     seo_title = models.CharField(
         _('SEO Title'), blank=True, max_length=120)
@@ -577,30 +670,6 @@ class BlogEntryPage(getCMSContentModel(content_attr='content'),
         return LayoutResponse(
             self, layout, request, context=context).make_response()
 
-    def previous_post(self):
-        if not self.blog:
-            return None
-        query_for_prev = Q(
-            Q(Q(update_date=self.update_date) &
-              Q(slug__lt=self.slug)) |
-            Q(update_date__lt=self.update_date))
-        ordering = ('-update_date', '-slug')
-        siblings = self.blog.get_entries().exclude(id=self.id)
-        prev_post = siblings.filter(query_for_prev).order_by(*ordering)[:1]
-        return prev_post[0] if prev_post else None
-
-    def next_post(self):
-        if not self.blog:
-            return None
-        query_for_next = Q(
-            Q(Q(update_date=self.update_date) &
-              Q(slug__gt=self.slug)) |
-            Q(update_date__gt=self.update_date))
-        ordering = ('update_date', 'slug')
-        siblings = self.blog.get_entries().exclude(id=self.id)
-        next_post = siblings.filter(query_for_next).order_by(*ordering)[:1]
-        return next_post[0] if next_post else None
-
     def delete(self, *args, **kwargs):
         path = self.poster_image.name
         super(BlogEntryPage, self).delete(*args, **kwargs)
@@ -664,8 +733,9 @@ class BlogCategory(models.Model, BlogRelatedPage):
         return title
 
     def get_entries(self):
+        ordering = OrderEntriesMixin.ORDER_BY_UPDATE.split(',')
         return self.entries.published().filter(
-            blog=self.blog).order_by('-update_date', 'slug').distinct()
+            blog=self.blog).order_by(*ordering).distinct()
 
     def get_layout(self):
         return self.blog.get_layout_for(Blog.LANDING_PAGE)
@@ -684,11 +754,16 @@ class BlogCategory(models.Model, BlogRelatedPage):
         unique_together = (("slug", 'blog'),)
 
 
-class RiverPlugin(CMSPlugin):
-
+class RiverPlugin(OrderEntriesMixin, CMSPlugin):
     title = models.CharField(_('title'), max_length=100)
     # allow maximum 20 categories and compute max chars taking commas into
     #   consideration
+    entries_ordering = models.CharField(
+        max_length=255, blank=False, null=False,
+        choices=OrderEntriesMixin.ordering_choices,
+        default=OrderEntriesMixin.ORDER_BY_PUBLICATION,
+        help_text=_('Blog entries ordering')
+    )
     categories = models.CharField(
         BlogCategory, max_length=(
             CATEGORY_NAME_LENGTH * MAX_CATEGORIES_IN_PLUGIN +
@@ -703,10 +778,11 @@ class RiverPlugin(CMSPlugin):
         db_table = 'cmsplugin_riverplugin'
 
     def get_entries(self):
-        qs = BlogEntryPage.objects.published().filter(
+        entries = super(RiverPlugin, self).get_entries()
+        qs = entries.published().filter(
             categories__name__in=self.categories.split(','),
             blog__site=Site.objects.get_current()
-        ).distinct().order_by('-update_date', 'slug')
+        ).distinct()
         return qs
 
     def __unicode__(self):

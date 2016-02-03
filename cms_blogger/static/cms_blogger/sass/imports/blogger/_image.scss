@@ -1,33 +1,37 @@
 @mixin image($ns){
     #{$ns}{
+        .entry-image-container {
+            .img-details {
+                background: #F8F8F8;
+                border: 0;
+                margin-top: 0 !important;
+                font-size: 11px;
+                line-height: 18px;
+                letter-spacing: 1px;
+                font-weight: 400;
+                display: inline-block;
+                padding: 10px 31px 15px;
+                box-sizing: border-box;
+                text-align: initial;
 
-        .img-details {
-            background: #333333;
-            border: 0;
-            margin-top: 0 !important;
-            font-size: 11px;
-            line-height: 18px;
-            letter-spacing: 1px;
-            font-weight: 400;
-            display: inline-block;
+                .img-caption {
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    color: #9D9C9C;
+                    line-height: 18px;
+                    font-weight: bold;
+                    display: block;
+                }
 
-            .img-caption {
-                color: #efefef;
-                padding: 15px;
-                padding-bottom: 5px !important;
-                display: block;
-            }
+                .img-credit {
+                    font-size: 14px;
+                    color: #4a4a4a;
+                    line-height: 18px;
+                    font-weight: 400;
+                }
 
-            .img-credit {
-                color: #999999;
-                padding: 15px;
-                display: block;
-            }
-            .img-caption + .img-credit {
-                padding: 0 15px 15px 15px;
             }
         }
-
         .blog-plomotion-plugin,
         .blog-entry{
             .img-details{

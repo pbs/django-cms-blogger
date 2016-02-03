@@ -1,5 +1,5 @@
 from django.contrib.syndication.views import Feed
-from django.template.context import RequestContext
+from .utils import get_from_context
 from .views import get_blog_or_404
 from .settings import POSTS_ON_RSS
 import urlparse
@@ -16,8 +16,7 @@ class BlogFeed(Feed):
         scheme, netloc = urlparse.urlparse(
             request.META.get("HTTP_X_ORIGINAL_URL", ""))[:2]
         if netloc:
-            context = RequestContext(request)
-            proxy_prefix = context.get('PROXY_REWRITE_RULE', '')
+            proxy_prefix = get_from_context(request, 'PROXY_REWRITE_RULE', '')
             self.original_url = urlparse.urlunparse(
                 (scheme, netloc, proxy_prefix, '', '', ''))
 
@@ -69,4 +68,3 @@ class BlogFeed(Feed):
     item_enclosure_mime_type = 'image/png'
     # for performance reasons
     item_enclosure_length = 0
-

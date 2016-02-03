@@ -1,16 +1,17 @@
-from django import forms
+from django.contrib.contenttypes.forms import BaseGenericInlineFormSet
+from django.contrib.sites.models import Site
+from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.auth.models import User
+from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.safestring import mark_safe
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.template.defaultfilters import slugify
-from django.forms.util import ErrorList
-from django.contrib.contenttypes.generic import BaseGenericInlineFormSet
-from django.contrib.sites.models import Site
-from django.utils.translation import get_language, ugettext_lazy as _
-from django.utils import timezone
-from django.utils.safestring import mark_safe
-from django.contrib.auth.models import User
+from django.forms.utils import ErrorList
+from django.conf import settings
 from django.db import router
+from django import forms
 
 from cms.plugin_pool import plugin_pool
 from cms.plugins.text.settings import USE_TINYMCE
@@ -18,26 +19,18 @@ from cms.plugins.text.widgets.wymeditor_widget import WYMEditor
 from cms.utils.plugins import get_placeholders
 from cms.models import Page, Title
 from cms.exceptions import NoHomeFound
-
 from cms_layouts.models import Layout
-from cms_layouts.slot_finder import (
-    get_fixed_section_slots, MissingRequiredPlaceholder)
-
-from django_select2.fields import (
-    AutoModelSelect2MultipleField, AutoModelSelect2TagField)
-
-from .models import (
-    Blog, BlogEntryPage, BlogCategory, Author, RiverPlugin, HomeBlog,
-    MAX_CATEGORIES_IN_PLUGIN)
-from .widgets import (
-    TagItWidget, ButtonWidget, DateTimeWidget, PosterImage, SpinnerWidget,
-    BootstrapMultiselect)
-from .slug import get_unique_slug
-from .utils import (
-    user_display_name, get_allowed_sites, set_cms_site, get_current_site)
-from .settings import DISALLOWED_ENTRIES_SLUGS
+from cms_layouts import slot_finder
 from cms.templatetags.cms_admin import admin_static_url
-from django.contrib.admin.templatetags.admin_static import static
+
+from django_select2 import fields as f
+
+from . import models as m
+from . import widgets as w
+from . import slug as slug_utils
+from . import utils
+from . import settings as blog_settings
+
 import json
 
 
@@ -51,8 +44,8 @@ class BlogLayoutInlineFormSet(BaseGenericInlineFormSet):
         if len(data) < 1:
             raise ValidationError('At least one layout is required!')
 
-        if len(data) > len(Blog.LAYOUTS_CHOICES):
-            layout_types_count = len(Blog.LAYOUTS_CHOICES)
+        if len(data) > len(m.Blog.LAYOUTS_CHOICES):
+            layout_types_count = len(m.Blog.LAYOUTS_CHOICES)
             raise ValidationError(
                 'There can be a maximum of %d layouts.' % layout_types_count)
 
@@ -65,21 +58,21 @@ class BlogLayoutInlineFormSet(BaseGenericInlineFormSet):
 
         specific_layout_types = [
             layout_type
-            for layout_type in Blog.LAYOUTS_CHOICES.keys()
-            if layout_type != Blog.ALL]
+            for layout_type in m.Blog.LAYOUTS_CHOICES.keys()
+            if layout_type != m.Blog.ALL]
 
         # if the default blog layout type is not submitted check if there
         #   are layouts for all of the rest types
-        if Blog.ALL not in submitted_layout_types:
+        if m.Blog.ALL not in submitted_layout_types:
             if not all([specific_layout_type in submitted_layout_types
                         for specific_layout_type in specific_layout_types]):
                 pretty_specific_layout_types = (
-                    Blog.LAYOUTS_CHOICES[layout_type]
+                    m.Blog.LAYOUTS_CHOICES[layout_type]
                     for layout_type in specific_layout_types)
                 raise ValidationError(
                     "If you do not have a layout for %s you need to specify "
                     "a layout for all the rest layout types: %s" % (
-                        Blog.LAYOUTS_CHOICES[Blog.ALL],
+                        m.Blog.LAYOUTS_CHOICES[m.Blog.ALL],
                         ', '.join(pretty_specific_layout_types)))
         return self.cleaned_data
 
@@ -114,8 +107,8 @@ def is_valid_for_layout(page, raise_errors=True):
     """
     try:
         slots = get_placeholders(page.get_template())
-        get_fixed_section_slots(slots)
-    except MissingRequiredPlaceholder as e:
+        slot_finder.get_fixed_section_slots(slots)
+    except slot_finder.MissingRequiredPlaceholder as e:
         if not raise_errors:
             return False
         raise ValidationError(
@@ -159,7 +152,7 @@ class LayoutForm(forms.ModelForm):
 class BlogLayoutForm(LayoutForm):
     layout_type = forms.IntegerField(
         label='Layout Type',
-        widget=forms.Select(choices=Blog.LAYOUTS_CHOICES.items()))
+        widget=forms.Select(choices=m.Blog.LAYOUTS_CHOICES.items()))
 
     class Meta:
         fields = ('layout_type', 'from_page', )
@@ -168,21 +161,21 @@ class BlogLayoutForm(LayoutForm):
         layout_type = self.cleaned_data.get('layout_type', None)
         if layout_type is None:
             raise ValidationError("Layout Type required")
-        if layout_type not in Blog.LAYOUTS_CHOICES.keys():
+        if layout_type not in m.Blog.LAYOUTS_CHOICES.keys():
             raise ValidationError(
                 "Not a valid Layout Type. Valid choices are: %s" % (
-                    ', '.join(Blog.LAYOUTS_CHOICES.values())))
+                    ', '.join(m.Blog.LAYOUTS_CHOICES.values())))
         return layout_type
 
 
-class MultipleUserField(AutoModelSelect2MultipleField):
+class MultipleUserField(f.AutoModelSelect2MultipleField):
     search_fields = ['first_name__icontains', 'last_name__icontains',
                      'email__icontains', 'username__icontains']
     queryset = User.objects.all()
     empty_values = [None, '', 0]
 
     def label_from_instance(self, obj):
-        return user_display_name(obj)
+        return utils.user_display_name(obj)
 
 
 def _save_related(form, commit, model_obj, *form_functions):
@@ -224,7 +217,7 @@ class AbstractBlogForm(forms.ModelForm):
 
     def set_site(self, site):
 
-        @set_cms_site
+        @utils.set_cms_site
         def change_session_site(request):
             return site
 
@@ -280,7 +273,7 @@ class BlogForm(AbstractBlogForm):
               static('cms_blogger/js/categories-widget.js'),)
 
     class Meta:
-        model = Blog
+        model = m.Blog
         exclude = ()
 
     def __init__(self, *args, **kwargs):
@@ -322,7 +315,7 @@ class BlogForm(AbstractBlogForm):
         slug = slugify(self.cleaned_data.get('slug', '').strip())
         if not slug:
             raise ValidationError('Slug required.')
-        if Blog.objects.exclude(pk=self.instance.pk).filter(
+        if m.Blog.objects.exclude(pk=self.instance.pk).filter(
                 site=self.instance.site, slug=slug).exists():
             raise ValidationError("Blog with this slug already exists.")
         return slug
@@ -342,9 +335,9 @@ class BlogForm(AbstractBlogForm):
         new_category_names = names - existing_names
 
         for name in new_category_names:
-            BlogCategory.objects.create(name=name, blog=saved_blog)
+            m.BlogCategory.objects.create(name=name, blog=saved_blog)
 
-        for category in BlogCategory.objects.filter(
+        for category in m.BlogCategory.objects.filter(
                 name__in=removed_categories, blog=saved_blog):
             category.delete()
 
@@ -372,7 +365,7 @@ class HomeBlogForm(AbstractBlogForm):
             self.initial['title'] = 'Latest blog posts'
 
     class Meta:
-        model = HomeBlog
+        model = m.HomeBlog
         exclude = ()
 
 
@@ -400,7 +393,7 @@ class BlogLayoutMissingForm(AbstractBlogForm):
         return saved
 
     class Meta:
-        model = Blog
+        model = m.Blog
         fields = ('layout_page', )
 
 
@@ -410,14 +403,14 @@ class BlogAddForm(AbstractBlogForm):
         site = Site.objects.get_current()
         self.instance.site = site
         slug = self.cleaned_data.get('slug', None)
-        if Blog.objects.filter(site=self.instance.site, slug=slug).exists():
+        if m.Blog.objects.filter(site=self.instance.site, slug=slug).exists():
             raise ValidationError("Blog with this slug already exists.")
         self._clean_home_page(site)
         return self.cleaned_data
 
     def _allow_current_user(self, blog):
-        if (blog.allowed_users.count() == 0
-                and self.request and self.request.user):
+        if (blog.allowed_users.count() == 0 and
+                self.request and self.request.user):
             blog.allowed_users.add(self.request.user)
 
     def save(self, commit=True):
@@ -429,7 +422,7 @@ class BlogAddForm(AbstractBlogForm):
         return saved
 
     class Meta:
-        model = Blog
+        model = m.Blog
         fields = ('title', 'slug',)
 
 
@@ -442,7 +435,7 @@ class HomeBlogAddForm(AbstractBlogForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         if self.request and not self.request.user.is_superuser:
-            allowed_sites = get_allowed_sites(self.request, HomeBlog)
+            allowed_sites = utils.get_allowed_sites(self.request, m.HomeBlog)
         else:
             allowed_sites = Site.objects.all()
         site_field = self.base_fields['site']
@@ -451,7 +444,7 @@ class HomeBlogAddForm(AbstractBlogForm):
         super(HomeBlogAddForm, self).__init__(*args, **kwargs)
         if 'title' not in self.initial:
             self.initial['title'] = 'Latest blog posts'
-        current_site = get_current_site(self.request, HomeBlog)
+        current_site = utils.get_current_site(self.request, m.HomeBlog)
         if ('site' not in self.initial and
                 current_site in site_field.queryset):
             self.initial['site'] = current_site
@@ -460,13 +453,13 @@ class HomeBlogAddForm(AbstractBlogForm):
         site = self.cleaned_data.get('site')
         if not site:
             raise ValidationError("Site is required.")
-        if site not in get_allowed_sites(self.request, HomeBlog):
+        if site not in utils.get_allowed_sites(self.request, m.HomeBlog):
             raise ValidationError("You do not have permissions on this site.")
-        if HomeBlog.objects.filter(site=site).exists():
+        if m.HomeBlog.objects.filter(site=site).exists():
             raise ValidationError(
                 "This site already has a %s. You may only have one %s per"
                 " site. You may change it from the list view." % (
-                    (HomeBlog._meta.verbose_name.lower(), ) * 2))
+                    (m.HomeBlog._meta.verbose_name.lower(), ) * 2))
         return site
 
     def clean(self):
@@ -482,7 +475,7 @@ class HomeBlogAddForm(AbstractBlogForm):
         return saved
 
     class Meta:
-        model = HomeBlog
+        model = m.HomeBlog
         fields = ('site', 'title')
 
 
@@ -523,7 +516,7 @@ class EntryChangelistForm(forms.ModelForm):
         return is_published
 
     class Meta:
-        model = BlogEntryPage
+        model = m.BlogEntryPage
         exclude = ()
 
 
@@ -544,7 +537,7 @@ class BlogEntryPageAddForm(forms.ModelForm):
         super(BlogEntryPageAddForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = BlogEntryPage
+        model = m.BlogEntryPage
         fields = ('blog', )
 
 
@@ -585,8 +578,8 @@ class ButtonField(forms.Field):
         super(ButtonField, self).__init__(*args, **kwargs)
 
 
-class AuthorsField(AutoModelSelect2TagField):
-    queryset = Author.objects.db_manager(router.db_for_write(Author))
+class AuthorsField(f.AutoModelSelect2TagField):
+    queryset = m.Author.objects.db_manager(router.db_for_write(m.Author))
     empty_values = [None, '', 0]
     search_fields = ['name__icontains', 'user__first_name__icontains',
                      'user__last_name__icontains', 'user__email__icontains',
@@ -600,7 +593,7 @@ class AuthorsField(AutoModelSelect2TagField):
     def make_authors(self):
         # since this might be a GET request and it does a db updates,
         #   ensure it uses the 'write' db for reads also
-        author_mgr = Author.objects.db_manager(router.db_for_write(Author))
+        author_mgr = m.Author.objects.db_manager(router.db_for_write(m.Author))
         user_mgr = User.objects.db_manager(router.db_for_write(User))
         users_used = author_mgr.filter(
             user__isnull=False).values_list('user', flat=True)
@@ -616,36 +609,36 @@ class BlogEntryPageChangeForm(forms.ModelForm):
     body = forms.CharField(
         label='Blog Entry', required=True)
     authors = AuthorsField()
-    poster_image_uploader = forms.CharField(label="", widget=PosterImage())
+    poster_image_uploader = forms.CharField(label="", widget=w.PosterImage())
     categories = forms.ModelMultipleChoiceField(
         widget=forms.CheckboxSelectMultiple(),
         help_text=_("Check all the categories to apply to this "
                     "post. Uncheck to remove."),
-        queryset=BlogCategory.objects.none(), required=False)
+        queryset=m.BlogCategory.objects.none(), required=False)
 
-    publish = ButtonField(widget=ButtonWidget(
+    publish = ButtonField(widget=w.ButtonWidget(
         submit=True,
         on_click=_ADD_HIDDEN_VAR_TO_FORM % ('_pub_pressed', 'true', "")))
 
-    schedule_publish = ButtonField(widget=ButtonWidget(
+    schedule_publish = ButtonField(widget=w.ButtonWidget(
         attrs={'class': 'pull-right'},
         submit=True, text='Schedule Publish',
         on_click=_ADD_HIDDEN_VAR_TO_FORM % (
             '_schedule_pub_pressed', 'true', "")))
 
-    schedule_unpublish = ButtonField(widget=ButtonWidget(
+    schedule_unpublish = ButtonField(widget=w.ButtonWidget(
         attrs={'style': 'float: right'},
         submit=True, text='Schedule Unpublish',
         on_click=_ADD_HIDDEN_VAR_TO_FORM % (
             '_schedule_unpub_pressed', 'true', "")))
 
     start_publication = forms.Field(
-        required=False, widget=DateTimeWidget())
+        required=False, widget=w.DateTimeWidget())
     end_publication = forms.Field(
-        required=False, widget=DateTimeWidget())
+        required=False, widget=w.DateTimeWidget())
 
-    save_button = ButtonField(widget=ButtonWidget(submit=True, text='Save'))
-    preview_on_top = ButtonField(widget=ButtonWidget(text='Preview'))
+    save_button = ButtonField(widget=w.ButtonWidget(submit=True, text='Save'))
+    preview_on_top = ButtonField(widget=w.ButtonWidget(text='Preview'))
 
     class Media:
         css = {"all": ("cms_blogger/css/entry-change-form.css",
@@ -657,7 +650,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
               'cms_blogger/js/entry-preview.js', )
 
     class Meta:
-        model = BlogEntryPage
+        model = m.BlogEntryPage
         exclude = ('content', 'blog', 'slug', 'publication_date')
 
     def __init__(self, *args, **kwargs):
@@ -671,15 +664,15 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         self._init_save_button()
         self._init_authors_field(request)
         self.fields['body'].widget = _get_text_editor_widget()
-        if not 'body' in self.initial:
+        if 'body' not in self.initial:
             self.initial['body'] = self.instance.content_body
 
     def _init_authors_field(self, request):
         self.fields['authors'].widget.options['tokenSeparators'] = [',']
         self.fields['authors'].make_authors()
-        if (request and not self.initial.get('authors', None)
-                and self.instance.authors.count() == 0):
-            self.initial['authors'] = Author.objects.filter(
+        if (request and not self.initial.get('authors', None) and
+                self.instance.authors.count() == 0):
+            self.initial['authors'] = m.Author.objects.filter(
                 name='', user=request.user.pk)[:1]
 
     def _init_categ_field(self, entry):
@@ -701,7 +694,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         if self.instance.is_published:
             pub_button.text = 'Update'
         else:
-            pub_button.text = 'Save and continue'
+            pub_button.text = 'Save and Continue'
 
     def _init_preview_buttons(self):
         preview = self.fields['preview_on_top'].widget
@@ -724,15 +717,15 @@ class BlogEntryPageChangeForm(forms.ModelForm):
 
     def clean_title(self):
         title = self.cleaned_data.get('title').strip()
-        empty_qs = BlogEntryPage.objects.none()
+        empty_qs = m.BlogEntryPage.objects.none()
         # slug is generated only the first time
         if not self.instance.slug:
-            slug = get_unique_slug(self.instance, title, empty_qs)
+            slug = slug_utils.get_unique_slug(self.instance, title, empty_qs)
             if not slug:
                 raise ValidationError(
                     "Cannot generate slug from this title. Enter a valid"
                     " title consisting of letters, numbers or underscores.")
-            if slug in DISALLOWED_ENTRIES_SLUGS:
+            if slug in blog_settings.DISALLOWED_ENTRIES_SLUGS:
                 raise ValidationError(
                     "Cannot use slug generated from this title %s. This is a "
                     "system reserved slug. Change the title so that it can "
@@ -781,7 +774,7 @@ class BlogEntryPageChangeForm(forms.ModelForm):
         # exclude sumbitted authors + authors generated from users
         check_for_complete_removal = saved_entry.authors.exclude(
             id__in=submitted).filter(user__isnull=True)
-        rest_of_entries = BlogEntryPage.objects.exclude(pk=saved_entry.pk)
+        rest_of_entries = m.BlogEntryPage.objects.exclude(pk=saved_entry.pk)
         for author in check_for_complete_removal:
             entries_for_author = rest_of_entries.filter(authors=author.pk)
             if not entries_for_author.exists():
@@ -801,11 +794,27 @@ class BlogRiverForm(forms.ModelForm):
         '<span class="input-group-btn">'
         '<button class="btn btn-white multiselect-clear-filter" type="button">'
         '<i class="fa fa-times-circle red2"></i></button></span>')
-    categories = forms.MultipleChoiceField(
-        widget=BootstrapMultiselect(
+    entries_ordering = forms.ChoiceField(
+        widget=w.BootstrapSelect(
             attrs={
                 'multiselect': json.dumps({
-                    "selectedList": MAX_CATEGORIES_IN_PLUGIN,
+                    "selectedList": 1,
+                    "header": "Choose categories below",
+                    "buttonClass": "btn btn-white btn-primary",
+                    "enableFiltering": False,
+                    "templates": {
+                        "filterClearBtn": cancel_filter_btn_html,
+                    }
+                }),
+                "max_items_allowed": 1,
+            }),
+        choices=m.OrderEntriesMixin.ordering_choices,
+    )
+    categories = forms.MultipleChoiceField(
+        widget=w.BootstrapMultiselect(
+            attrs={
+                'multiselect': json.dumps({
+                    "selectedList": m.MAX_CATEGORIES_IN_PLUGIN,
                     "header": "Choose categories below",
                     "buttonClass": "btn btn-white btn-primary",
                     "enableFiltering": True,
@@ -813,12 +822,12 @@ class BlogRiverForm(forms.ModelForm):
                         "filterClearBtn": cancel_filter_btn_html,
                     }
                 }),
-                "max_items_allowed": MAX_CATEGORIES_IN_PLUGIN,
+                "max_items_allowed": m.MAX_CATEGORIES_IN_PLUGIN,
             }))
     spinner_opts = ('{min: 3, max: 10,'
                     'btn_up_class: "btn-info", btn_down_class: "btn-info"}')
     number_of_entries = forms.CharField(
-        widget=SpinnerWidget(attrs={'spinner': spinner_opts}))
+        widget=w.SpinnerWidget(attrs={'spinner': spinner_opts}))
 
     def __init__(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -827,8 +836,8 @@ class BlogRiverForm(forms.ModelForm):
         if plugin_page and plugin_page.site and categories_field:
             categories_field.choices = [
                 (name, name)
-                for name in BlogCategory.objects.filter(
-                    blog__site=plugin_page.site
+                for name in m.BlogCategory.objects.filter(
+                        blog__site=plugin_page.site
                 ).order_by('name').values_list('name', flat=True).distinct()]
 
         super(BlogRiverForm, self).__init__(*args, **kwargs)
@@ -847,9 +856,9 @@ class BlogRiverForm(forms.ModelForm):
 
     def clean_categories(self):
         categories = set(self.cleaned_data.get('categories'))
-        if len(categories) > MAX_CATEGORIES_IN_PLUGIN:
+        if len(categories) > m.MAX_CATEGORIES_IN_PLUGIN:
             raise ValidationError(
-                'You can add only %d categories.' % MAX_CATEGORIES_IN_PLUGIN)
+                'You can add only %d categories.' % m.MAX_CATEGORIES_IN_PLUGIN)
         return ','.join(list(categories))
 
     def clean_number_of_entries(self):
@@ -863,7 +872,7 @@ class BlogRiverForm(forms.ModelForm):
         return no_entries
 
     class Meta:
-        model = RiverPlugin
+        model = m.RiverPlugin
         exclude = ()
 
 
@@ -875,20 +884,20 @@ class MoveEntriesForm(forms.Form):
         initial=True,
         required=False)
     entries = forms.ModelMultipleChoiceField(
-        queryset=BlogEntryPage.objects.none(),
-        initial=BlogEntryPage.objects.none(),
+        queryset=m.BlogEntryPage.objects.none(),
+        initial=m.BlogEntryPage.objects.none(),
         widget=forms.CheckboxSelectMultiple(),
         label="The following blog entries will be "
               "moved to the destination blog",
         required=False)
 
     def __init__(self, *args, **kwargs):
-        entries = kwargs.pop('entries', BlogEntryPage.objects.none())
-        checked = kwargs.pop('checked', BlogEntryPage.objects.none())
+        entries = kwargs.pop('entries', m.BlogEntryPage.objects.none())
+        checked = kwargs.pop('checked', m.BlogEntryPage.objects.none())
         destination_blog = kwargs.pop('destination_blog', None)
         super(MoveEntriesForm, self).__init__(*args, **kwargs)
         self.fields['destination_blog'] = forms.ModelChoiceField(
-            Blog.objects.filter(
+            m.Blog.objects.filter(
                 site=Site.objects.get_current()),
             required=True)
         self.fields['destination_blog'].initial = destination_blog

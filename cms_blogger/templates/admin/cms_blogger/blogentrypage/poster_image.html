@@ -1,10 +1,12 @@
 {% load i18n admin_modify filermedia blogger %}
-{% load url from future %}
 
 <div class="poster-image-container">
     <div class="left-side pull-left">
         <label class="no-margin-bottom">Default Image</label>
-        <div class="help-block no-margin-top"> Image must be 16:9 aspect ratio</div>
+        <div class="help-block no-margin-top">
+	  <p> Image must be 16:9 aspect ratio. </p>
+	  <p> The recomended image size is {{poster_width}} x {{poster_height}}. </p>
+	</div>
         <div id="upload-button" class="btn btn-xs btn-primary" title="{% trans 'upload files' %}"><i class="ace-icon fa fa-upload"></i> {% trans 'Upload' %}</div>
         <div id="delete-button" class="btn btn-xs btn-danger"> <i class="ace-icon fa fa-trash-o"></i>{% trans 'Remove' %}</div>
 
@@ -13,7 +15,7 @@
     <div id="fileInputQueue" class="right-side pull-right">
         <div id="fileUpload" class="clipboardItem fileUploadQueueItem thumbnail no-margin-bottom">
         {% if image_url %}
-            <div>
+            <div class="img-container">
                 <a href="{{ image_url }}" target="_blank">
                     <img src="{{ image_url }}" />
                 </a>

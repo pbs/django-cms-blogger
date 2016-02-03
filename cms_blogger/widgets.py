@@ -3,9 +3,8 @@ from django.utils.safestring import mark_safe
 from django.contrib.admin.templatetags.admin_static import static
 from dateutil import tz, parser
 from django.template.loader import render_to_string
-from .settings import (MAXIMUM_THUMBNAIL_FILE_SIZE,
-                       ALLOWED_THUMBNAIL_IMAGE_TYPES)
 
+from . import settings
 
 class ToggleWidget(forms.widgets.CheckboxInput):
 
@@ -16,7 +15,8 @@ class ToggleWidget(forms.widgets.CheckboxInput):
         is_disabled = (self.attrs.get('disabled', False) or
                        attrs.get('disabled', False))
         active = 'false' if is_disabled else 'true'
-        output = "%s" % (widget_html)
+        output = ("<label class='pull-left'>"
+                  "%s<span class='lbl'></span></label>" % widget_html)
         return mark_safe(output)
 
 
@@ -66,8 +66,8 @@ class ButtonWidget(forms.widgets.CheckboxInput):
 
     make_js_button = (
         "<script type='text/javascript'>"
-        "jQuery('#id_%s').addClass('default btn btn-primary').click(function(event) {"
-        "event.preventDefault();%s});"
+        "jQuery('#id_%s').addClass('default btn btn-primary').click("
+        "function(event) {event.preventDefault();%s});"
         "</script>")
     submit_on_click_js = (
         "jQuery(this).closest('form').append("
@@ -92,7 +92,7 @@ class ButtonWidget(forms.widgets.CheckboxInput):
         return mark_safe(
             u"%s<a %s href='%s' id='id_%s'>%s</a>%s" % (
                 self.hide_label % name,
-                forms.util.flatatt(self.build_attrs(attrs)),
+                forms.utils.flatatt(self.build_attrs(attrs)),
                 self.link_url, name, text,
                 self.make_js_button % (name, self._render_js_on_click(), )))
 
@@ -162,8 +162,10 @@ class PosterImage(forms.widgets.CheckboxInput):
             {
                 'blog_entry_id': self.blog_entry_id,
                 'image_url': self.image_url,
-                'size_limit': MAXIMUM_THUMBNAIL_FILE_SIZE,
-                'image_types': ALLOWED_THUMBNAIL_IMAGE_TYPES,
+                'size_limit': settings.MAXIMUM_THUMBNAIL_FILE_SIZE,
+                'image_types': settings.ALLOWED_THUMBNAIL_IMAGE_TYPES,
+                'poster_width': settings.POSTER_IMAGE_WIDTH,
+                'poster_height': settings.POSTER_IMAGE_HEIGHT,
             }
         )
 
@@ -239,4 +241,37 @@ class BootstrapMultiselect(forms.widgets.SelectMultiple):
         if self.max_selected:
             widget_html += self.max_selected_script % (
                 name, self.max_selected, self.max_selected)
+        return mark_safe(widget_html)
+
+
+class BootstrapSelect(forms.widgets.Select):
+
+    class Media:
+        css = {
+            'all': (
+                static('cms_blogger/css/bootstrap-multiselect.min.css'),
+            )
+        }
+        js = (static('cms_blogger/js/jquery-1.9.1.min.js'),
+              static('cms_blogger/js/bootstrap-multiselect.min.js'), )
+
+    multiselect_script = ("""<script type='text/javascript'>
+jQuery('#id_%s').multiselect(%s).next().css('width', 'auto')
+    .find('.multiselect-search').css('width', 'auto').next()
+    .find('.multiselect-clear-filter').css('height', '34px'); </script>""")
+
+    def __init__(self, attrs=None):
+        attrs = attrs or {}
+        self.multiselect_attrs = attrs.pop('multiselect', '{}')
+        self.max_selected = attrs.pop('max_items_allowed', None)
+        super(BootstrapSelect, self).__init__(attrs=attrs)
+
+    def render(self, name, value, attrs={}):
+        widget_html = super(BootstrapSelect, self).render(
+            name, value, attrs=attrs
+        )
+
+        widget_html += self.multiselect_script % (
+            name, self.multiselect_attrs)
+
         return mark_safe(widget_html)

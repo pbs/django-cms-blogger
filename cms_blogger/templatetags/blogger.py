@@ -43,7 +43,8 @@ def publish_date_box(entry):
     pub_time = as_utc(entry.publication_date)
     is_updated = mod_time > pub_time
 
-    display_date = mod_time if is_updated else pub_time
+    # display_date = mod_time if is_updated else pub_time
+    display_date = pub_time
     # entry is published for more than 3 months
     is_older = display_date < (datetime.datetime.utcnow() +
                                relativedelta.relativedelta(months=-3))

@@ -1,7 +1,8 @@
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_settings
 from django.contrib.auth.models import User, Permission
 from django.contrib.sites.models import Site
-from django.contrib.admin.util import flatten_fieldsets
+from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.admin.sites import AdminSite
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -12,7 +13,7 @@ from django.db import IntegrityError
 from dateutil import tz, parser
 
 from cms_blogger.models import *
-from cms_blogger import admin, forms
+from cms_blogger import admin, forms, utils
 from cms.api import create_page, add_plugin
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from menus.menu_pool import menu_pool
@@ -25,6 +26,10 @@ from cms_layouts.slot_finder import get_fixed_section_slots
 import xml.etree.ElementTree
 import urlparse
 import urllib
+
+import pytest
+import PIL.Image
+import pytz
 
 
 class TestMoveAction(TestCase):
@@ -472,7 +477,11 @@ class TestBlogModel(TestCase):
         self.assertEquals(self.client.get(landing_url).status_code, 200)
 
     def _make_blog(self):
-        form_data = {'title': 'one title', 'slug': 'one-title'}
+        form_data = {
+            'title':  'one title',
+            'slug': 'one-title',
+            'entries_ordering': OrderEntriesMixin.ORDER_BY_PUBLICATION,
+        }
         blog = Blog.objects.create(**form_data)
         blog.allowed_users.add(self.user)
         page_for_layouts = create_page(
@@ -771,6 +780,9 @@ class TestChangeLists(TestCase):
         self.client.logout()
 
 
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("blog_entries")
 class TestBlogEntryModel(TestCase):
 
     def setUp(self):
@@ -778,7 +790,10 @@ class TestBlogEntryModel(TestCase):
             'admin', 'admin@cms_blogger.com', 'secret')
         self.client.login(username='admin', password='secret')
         self.blog = Blog.objects.create(**{
-            'title': 'one title', 'slug': 'one-title'})
+            'title': 'one title',
+            'slug': 'one-title',
+            'entries_ordering': OrderEntriesMixin.ORDER_BY_UPDATE,
+        })
 
     def tearDown(self):
         self.client.logout()
@@ -802,40 +817,39 @@ class TestBlogEntryModel(TestCase):
         self.assertTrue(Blog.objects.filter(pk=self.blog.pk).exists())
 
     def test_next_prev_post_even(self):
-        for i in range(4):
-            BlogEntryPage.objects.create(**{
-                'title': '%s' % i, 'blog': self.blog,
-                'short_description': 'desc', 'is_published': True})
-        BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {e.title: e for e in BlogEntryPage.objects.all()}
-
-        self.assertEquals(entries["0"].previous_post(), None)
-        self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)
-        self.assertEquals(entries["1"].previous_post().pk, entries["0"].pk)
-        self.assertEquals(entries["1"].next_post().pk, entries["2"].pk)
-        self.assertEquals(entries["2"].previous_post().pk, entries["1"].pk)
-        self.assertEquals(entries["2"].next_post().pk, entries["3"].pk)
-        self.assertEquals(entries["3"].previous_post().pk, entries["2"].pk)
-        self.assertEquals(entries["3"].next_post(), None)
+        count = 4
+        entries = self.make_blog_entries(
+            publication_date=timezone.now(),
+            blog=self.blog,
+            how_many=count,
+        )
+        actual = {i: dict(prev=entries[i].previous_post(),
+                          next=entries[i].next_post()) for i in range(4)}
+        expected = {
+            0: dict(prev=None, next=entries[1]),
+            1: dict(prev=entries[0], next=entries[2]),
+            2: dict(prev=entries[1], next=entries[3]),
+            3: dict(prev=entries[2], next=None),
+        }
+        assert actual == expected
 
     def test_next_prev_post_odd(self):
-        for i in range(5):
-            BlogEntryPage.objects.create(**{
-                'title': '%s' % i, 'blog': self.blog,
-                'short_description': 'desc', 'is_published': True})
-        BlogEntryPage.objects.update(publication_date=timezone.now())
-        entries = {e.title: e for e in BlogEntryPage.objects.all()}
-
-        self.assertEquals(entries["0"].previous_post(), None)
-        self.assertEquals(entries["0"].next_post().pk, entries["1"].pk)
-        self.assertEquals(entries["1"].previous_post().pk, entries["0"].pk)
-        self.assertEquals(entries["1"].next_post().pk, entries["2"].pk)
-        self.assertEquals(entries["2"].previous_post().pk, entries["1"].pk)
-        self.assertEquals(entries["2"].next_post().pk, entries["3"].pk)
-        self.assertEquals(entries["3"].previous_post().pk, entries["2"].pk)
-        self.assertEquals(entries["3"].next_post().pk, entries["4"].pk)
-        self.assertEquals(entries["4"].previous_post().pk, entries["3"].pk)
-        self.assertEquals(entries["4"].next_post(), None)
+        count = 5
+        entries = self.make_blog_entries(
+            publication_date=timezone.now(),
+            blog=self.blog,
+            how_many=count,
+        )
+        actual = {i: dict(prev=entries[i].previous_post(),
+                          next=entries[i].next_post()) for i in range(count)}
+        expected = {
+            0: dict(prev=None, next=entries[1]),
+            1: dict(prev=entries[0], next=entries[2]),
+            2: dict(prev=entries[1], next=entries[3]),
+            3: dict(prev=entries[2], next=entries[4]),
+            4: dict(prev=entries[3], next=None),
+        }
+        assert actual == expected
 
     def test_draft(self):
         draft_entry = BlogEntryPage.objects.create(blog=self.blog)
@@ -1132,8 +1146,41 @@ class TestAuthorModel(TransactionTestCase):
             Author.objects.bulk_create([Author(slug='one'), ] * 2)
 
 
-class TestBlogPageViews(TestCase):
-    pass
+class TestBlogPageViews(TestBlogModel):
+
+    @override_settings(TIME_ZONE="America/New_York")
+    def test_timezone_correct_handling(self):
+        """
+        Presumption:
+        Blog entries urls are in UTC
+        Tested issue:
+        The code handled as the URL was in the timezone of the client, which did not
+        the actual published date in the database.
+        """
+        blog, _ = self._make_blog()
+        entry = self._make_entry(blog=blog)
+        entry.is_published = True
+        entry.publication_date = datetime.datetime(2014, 5, 23, 0, 30, tzinfo=pytz.utc)
+        entry.save()
+        blog.entries_slugs_with_date = True
+        blog.save()
+        entry_url = reverse(
+            'cms_blogger.views.entry_page', kwargs={
+                'blog_slug': 'one-title',
+                'year': entry.publication_date.year,
+                'month': entry.publication_date.strftime('%m'),
+                'day': entry.publication_date.strftime('%d'),
+                'entry_slug': 'first-entry'})
+
+        self.assertEquals(entry.get_absolute_url(), entry_url)
+        self.assertEquals(self.client.get(entry_url).status_code, 200)
+
+
+@override_settings(SITE_ID='')
+class TestManagers(TestCase):
+
+    def test_missing_site_handling(self):
+        self.assertEqual(list(BlogEntryPage.objects.on_site()), [])
 
 
 class TestSitemap(TestCase):
@@ -1314,3 +1361,53 @@ class TestSitemap(TestCase):
         self.assertEqual(len(locations), len(lastmods))
         for lastmod in lastmods:
             self.assertIsNot(lastmod, None)
+
+
+class ResizeSpecs(object):
+    POSTER_IMAGE_ASPECT_RATIO = 16.0 / 9.0
+    POSTER_MIN_IMAGE_WIDTH = 640
+    POSTER_MIN_IMAGE_HEIGHT = 360
+    POSTER_IMAGE_WIDTH = 1280
+    POSTER_IMAGE_HEIGHT = 720
+    POSTER_IMAGE_FILL_COLOR = (255, 255, 255, 0)
+    POSTER_IMAGE_COMPRESSION = 100
+
+    @classmethod
+    def too_large(cls):
+        return (cls.POSTER_IMAGE_WIDTH * 2, cls.POSTER_IMAGE_HEIGHT * 2)
+
+    @classmethod
+    def too_small(cls):
+        return (cls.POSTER_MIN_IMAGE_WIDTH / 2, cls.POSTER_IMAGE_HEIGHT)
+
+    @classmethod
+    def just_right(cls):
+        return ((cls.POSTER_IMAGE_WIDTH + cls.POSTER_MIN_IMAGE_WIDTH) / 2,
+                (cls.POSTER_IMAGE_HEIGHT + cls.POSTER_MIN_IMAGE_HEIGHT) / 2)
+
+
+
+@pytest.mark.parametrize("specs", (ResizeSpecs.too_small(),
+                                   ResizeSpecs.just_right(),
+                                   ResizeSpecs.too_large()))
+def test_fill_resize(specs):
+    filename = 'input_image.jpg'
+    input_image = PIL.Image.new('RGBA', specs, 'red')
+    contentfile = utils.image_to_contentfile(image=input_image,
+                                             filename=filename,
+                                             quality=100)
+    resized_contentfile = utils.resize_image(contentfile, ResizeSpecs)
+    resized_image = PIL.Image.open(resized_contentfile)
+    width, height = resized_image.size
+    assert (ResizeSpecs.POSTER_MIN_IMAGE_WIDTH <= width and
+            width <= ResizeSpecs.POSTER_IMAGE_WIDTH)
+    assert (ResizeSpecs.POSTER_MIN_IMAGE_HEIGHT <= height and
+            height <= ResizeSpecs.POSTER_IMAGE_HEIGHT)
+
+
+def test_file_with_extension():
+    initial_path = '/files/example.txt'
+    extension = 'pdf'
+    file_object = utils.NamedBytesIO(name=initial_path)
+    basename = utils.basename_with_extension(file_object.name, extension)
+    assert basename == 'example.pdf'
