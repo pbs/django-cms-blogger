@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+Revision f15251a (04.02.2016, 15:37 UTC)
+----------------------------------------
+
+* LUN-2606
+
+  * Fix document.write conflicts with hero snippets logic
+
+* LUN-2786
+
+  * Refactor sitemap to allow overriding BlogEntryPage selection.
+
+No other commits.
+
 Revision c562a5d (17.11.2015, 09:23 UTC)
 ----------------------------------------
 
