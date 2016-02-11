@@ -709,6 +709,7 @@ class BlogEntryPage(OrderEntriesSequenceMixin,
         verbose_name = "blog entry"
         verbose_name_plural = 'blog entries'
         unique_together = (("slug", "blog", "draft_id"),)
+        index_together = [["blog", "is_published", "publication_date"],]
 
     def __unicode__(self):
         return "<Draft Empty Blog Entry>" if self.is_draft else self.title
