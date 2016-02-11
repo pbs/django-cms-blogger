@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.fields import GenericRelation
@@ -229,6 +230,7 @@ class OrderEntriesSequenceMixin(object):
             }
         }[order]
 
+    @cached_property
     def previous_post(self):
         """
         Returns the previous blog entry based on entries ordering. When the
@@ -244,6 +246,7 @@ class OrderEntriesSequenceMixin(object):
         prev_post = siblings.filter(prev_entries).order_by(*order_by)[:1]
         return prev_post[0] if prev_post else None
 
+    @cached_property
     def next_post(self):
         """
         Returns the next blog entry based on entries ordering. When the
