@@ -823,8 +823,8 @@ class TestBlogEntryModel(TestCase):
             blog=self.blog,
             how_many=count,
         )
-        actual = {i: dict(prev=entries[i].previous_post(),
-                          next=entries[i].next_post()) for i in range(4)}
+        actual = {i: dict(prev=entries[i].previous_post,
+                          next=entries[i].next_post) for i in range(4)}
         expected = {
             0: dict(prev=None, next=entries[1]),
             1: dict(prev=entries[0], next=entries[2]),
@@ -840,8 +840,8 @@ class TestBlogEntryModel(TestCase):
             blog=self.blog,
             how_many=count,
         )
-        actual = {i: dict(prev=entries[i].previous_post(),
-                          next=entries[i].next_post()) for i in range(count)}
+        actual = {i: dict(prev=entries[i].previous_post,
+                          next=entries[i].next_post) for i in range(count)}
         expected = {
             0: dict(prev=None, next=entries[1]),
             1: dict(prev=entries[0], next=entries[2]),
