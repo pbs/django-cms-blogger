@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Revision d3d71e6 (15.02.2016, 12:45 UTC)
+----------------------------------------
+
+* LUN-2910
+
+  * Fix tests. Functions were turned to properties.
+  * Add index to speed up selects with publication_date ordering on blog entries.
+  * Cache previous/next post to remove extra costly queries.
+
+No other commits.
+
 Revision f15251a (04.02.2016, 15:37 UTC)
 ----------------------------------------
 
