@@ -24,7 +24,9 @@
     <script type="text/javascript">
     document.getElementById('month_{{date_var}}').innerHTML = {{date_var}}.getShortMonthString();
     document.getElementById('day_{{date_var}}').innerHTML = {{date_var}}.get2DigitDayString();
+    {% if show_year %}
     document.getElementById('year_{{date_var}}').innerHTML = {{date_var}}.getYear() < (new Date()).getYear() ? {{date_var}}.getFullYear() : "";
+    {% endif %}
     </script>
 </div>
 {% endspaceless %}
