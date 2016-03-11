@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 3529611 (11.03.2016, 13:59 UTC)
+----------------------------------------
+
+* LUN-2606
+
+  * year placeholder could be missing if entry is older
+
+No other commits.
+
 Revision d3d71e6 (15.02.2016, 12:45 UTC)
 ----------------------------------------
 
