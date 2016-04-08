@@ -29,5 +29,6 @@ setup(
     include_package_data=True,
     install_requires=DEPENDENCIES,
     dependency_links=DEPENDENCY_LINKS,
-    classifiers=[]
+    setup_requires=["setuptools-tasks"],
+    classifiers=[],
 )
