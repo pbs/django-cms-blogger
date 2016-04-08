@@ -36,3 +36,8 @@ pytest-results.xml
 
 # Sass
 .sass-cache
+
+# Ignore compiled static files
+cms_blogger/static/cms_blogger/css/blogger.css
+cms_blogger/static/cms_blogger/css/entry-change-form.css
+cms_blogger/static/cms_blogger/css/toggles_ie.css
