@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+Revision 6e2a504 (08.04.2016, 12:47 UTC)
+----------------------------------------
+
+* LUN-2842
+
+  * Remove compiled css files.
+  * Use setuptools-tasks for static files compiling.
+
+* Misc commits
+
+  * Update setup.py version to 0.7.0.pbs.14.
+
 Revision 3529611 (11.03.2016, 13:59 UTC)
 ----------------------------------------
 
