@@ -49,8 +49,7 @@ class TagItWidget(forms.widgets.TextInput):
         return mark_safe(output)
 
 
-class ButtonWidget(forms.widgets.CheckboxInput):
-    # make it a CheckboxInput in order to not show the ':' after the label
+class ButtonWidget(forms.widgets.Widget):
 
     class Media:
         css = {
@@ -75,9 +74,9 @@ class ButtonWidget(forms.widgets.CheckboxInput):
         "'name', '_continue').val('Save')"
         ").submit();")
 
-    def __init__(self, attrs=None, check_test=None, link_url='',
+    def __init__(self, attrs=None, link_url='',
                  text=None, submit=False, on_click=''):
-        super(ButtonWidget, self).__init__(attrs, check_test)
+        super(ButtonWidget, self).__init__(attrs)
         self.text = text
         self.link_url = link_url or "#"
         self.submit = submit
@@ -151,7 +150,7 @@ class DateTimeWidget(forms.widgets.TextInput):
         return value_as_date.astimezone(tz.tzutc())
 
 
-class PosterImage(forms.widgets.CheckboxInput):
+class PosterImage(forms.widgets.Widget):
 
     class Media:
         js = (static('filer/js/fileuploader.js'),)
@@ -169,6 +168,16 @@ class PosterImage(forms.widgets.CheckboxInput):
             }
         )
 
+    def value_from_datadict(self, data, files, name):
+        """
+        The PosterImage Widget does not use the normal django form
+        validation/input field naming and conventions.
+        The image is directly uploaded before the form is saved.
+
+        In the past PosterImage inherited CheckboxInput which made this
+        function always return False and only hid the workaround.
+        """
+        return False
 
 class SpinnerWidget(forms.widgets.TextInput):
 
