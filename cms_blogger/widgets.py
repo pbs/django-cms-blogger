@@ -10,14 +10,8 @@ class ToggleWidget(forms.widgets.CheckboxInput):
 
     def render(self, name, value, attrs={}):
         attrs.update({'class': 'ace ace-switch ace-switch-4 btn-empty'})
-        widget_html = super(ToggleWidget, self).render(
+        return super(ToggleWidget, self).render(
             name, value, attrs=attrs)
-        is_disabled = (self.attrs.get('disabled', False) or
-                       attrs.get('disabled', False))
-        active = 'false' if is_disabled else 'true'
-        output = ("<label class='pull-left'>"
-                  "%s<span class='lbl'></span></label>" % widget_html)
-        return mark_safe(output)
 
 
 class TagItWidget(forms.widgets.TextInput):
