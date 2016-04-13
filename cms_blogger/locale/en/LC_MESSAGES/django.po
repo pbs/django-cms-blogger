@@ -39,10 +39,10 @@ msgstr ""
 msgid "Super Landing Page Layout description"
 msgstr ""
 "Select a layout for the Super Landing Page. A layouts is comprised of the "
-"smart snippet and plugins used in the header, footer, and right rail. Select "
-"a page from which to inherit these smart snippets and plugins, and then open "
+"custom component and components used in the header, footer, and right rail. Select "
+"a page from which to inherit these custom components and components, and then open "
 "the 'Customize Layout Content' section to override or add to the existing "
-"smart snippets and plugins in the page."
+"custom components and components in the page."
 
 #: admin.py:90 admin.py:91
 msgid "Super Landing Page Layout Chooser"
