@@ -12,7 +12,7 @@ from .utils import paginate_queryset
 
 class BlogRiverPlugin(AdminHelper, CMSPluginBase):
     model = RiverPlugin
-    name = _("Blog River Plugin")
+    name = _("Blog River")
     render_template = "cms_blogger/blog_promotion.html"
     form = BlogRiverForm
     change_form_template = "admin/cms_blogger/promotion_plugin_form.html"
