@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+Revision 6e97fbd (06.05.2016, 15:23 UTC)
+----------------------------------------
+
+* LUN-2958
+
+  * Drop *plugin* from cms-plugin name.
+  * Add messages.
+
+* LUN-2965
+
+  * Remove style fix. The fix should be general for all checbox inputs.
+  * Remove workarounds. Make PosterImage and ButtonWidget extend Widget.
+
+* Misc commits
+
+  * Update setup.py
+
 Revision 6e2a504 (08.04.2016, 12:47 UTC)
 ----------------------------------------
 
