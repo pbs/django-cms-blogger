@@ -84,7 +84,13 @@ form ul.tagit li.tagit-choice.active-tag {
 {% endblock %}
 
 {% block object-tools-items %}
-    {% if has_absolute_url and not original.is_draft %}<li><a href="http{% if request.is_secure %}s{% endif %}://{{original.site.domain}}{{original.get_absolute_url}}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+    {% if has_absolute_url and not original.is_draft %}
+    <li>
+        <a href="http{% if request.is_secure %}s{% endif %}://{{original.site.domain}}{{original.get_absolute_url}}?preview" target="_blank" class="viewsitelink">
+        {% trans "View on site" %}
+        </a>
+    </li>
+    {% endif%}
 {% endblock %}
 
 {% block content_title %}
