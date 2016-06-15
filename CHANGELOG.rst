@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision c55a908 (15.06.2016, 14:39 UTC)
+----------------------------------------
+
+* LUN-2758
+
+  * Add target "_blank" for "View on site"
+
+No other commits.
+
 Revision 6e97fbd (06.05.2016, 15:23 UTC)
 ----------------------------------------
 
