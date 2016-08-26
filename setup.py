@@ -6,10 +6,10 @@ README = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md')
 
 
 DEPENDENCIES = [
-    'django-cms>=2.3.5,<2.3.6',
-    'django-cms-layouts>=0.1',
+    'django-cms>=2.3.5pbs,<2.3.5pbs.1000',
+    'django-cms-layouts>=0.1.1.pbs,<0.1.1.pbs1000',
     'django-select2',
-    'django-filer>=0.9pbs,<0.9.1',
+    'django-filer>=0.9pbs,<0.9pbs.1000',
     'python-dateutil >= 2.2',
 ]
 
