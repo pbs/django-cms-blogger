@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 46a3cff (29.09.2016, 14:17 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Fix tox/pip issue.
+
 Revision 6062bf5 (26.08.2016, 14:49 UTC)
 ----------------------------------------
 
