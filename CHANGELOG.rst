@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 8662ff6 (06.09.2018, 14:27 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Force pbs fork of Django-Select2 to be used
+
 Revision 46a3cff (29.09.2016, 14:17 UTC)
 ----------------------------------------
 
